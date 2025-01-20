@@ -6,7 +6,8 @@
 	"type": "module",
 	"scripts": {
 		"start": "node src/index.js",
-		"dev": "nodemon src/index.js"
+		"dev": "nodemon src/index.js",
+		"migrate": "sequelize-cli db:migrate"
 	},
 	"keywords": [],
 	"author": "",
@@ -19,7 +20,8 @@
 		"helmet": "^8.0.0",
 		"morgan": "^1.10.0",
 		"mysql2": "^3.11.4",
-		"sequelize": "^6.37.5"
+		"sequelize": "^6.37.5",
+		"sequelize-cli": "^6.6.2"
 	},
 	"devDependencies": {
 		"nodemon": "^3.1.7"

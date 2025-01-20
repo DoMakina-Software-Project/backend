@@ -1,9 +1,9 @@
 import app from "./config/express.js";
 import router from "./routes/index.js";
 import { PORT } from "./config/vars.js";
-// import { initDB } from "./config/db.js";
+import { initDB } from "./config/db.js";
 
-// initDB();
+initDB();
 
 app.use("/api", router);
 
