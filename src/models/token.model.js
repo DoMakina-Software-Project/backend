@@ -12,7 +12,7 @@ const Token = sequelize.define(
 			autoIncrement: true,
 		},
 		type: {
-			type: DataTypes.STRING(50),
+			type: DataTypes.ENUM("password", "email"),
 			allowNull: false,
 		},
 		created_at: {

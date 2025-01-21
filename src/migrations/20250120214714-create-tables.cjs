@@ -141,7 +141,7 @@ module.exports = {
 				primaryKey: true,
 			},
 			type: {
-				type: Sequelize.STRING(50),
+				type: Sequelize.ENUM("password", "email"), // Set the type to ENUM
 				allowNull: false,
 			},
 			created_at: {

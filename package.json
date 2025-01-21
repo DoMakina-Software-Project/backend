@@ -7,7 +7,9 @@
 	"scripts": {
 		"start": "node src/index.js",
 		"dev": "nodemon src/index.js",
-		"migrate": "sequelize-cli db:migrate"
+		"migrate": "sequelize-cli db:migrate",
+		"undo-migrate": "sequelize-cli db:migrate:undo",
+		"undo-all-migrate": "sequelize-cli db:migrate:undo:all"
 	},
 	"keywords": [],
 	"author": "",
