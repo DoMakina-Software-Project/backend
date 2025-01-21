@@ -13,3 +13,11 @@ export const DB = {
 	password: process.env.DB_PASSWORD || "your_db_password",
 	database: process.env.DB_DATABASE || "your_db_name",
 };
+
+export const MAIL = {
+	host: process.env.MAIL_HOST || "live.smtp.mailtrap.io",
+	port: parseInt(process.env.MAIL_PORT || "587", 10),
+	user: process.env.MAIL_USER || "your_mail_user",
+	pass: process.env.MAIL_PASSWORD || "your_mail_password",
+	from: process.env.MAIL_FROM || "your_mail_from",
+};
