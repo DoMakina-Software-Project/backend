@@ -10,11 +10,6 @@ module.exports = {
 				autoIncrement: true,
 				primaryKey: true,
 			},
-			recipe_user_id: {
-				type: Sequelize.STRING(255),
-				allowNull: false,
-				unique: true,
-			},
 			email: {
 				type: Sequelize.STRING(255),
 				allowNull: false,
@@ -295,7 +290,6 @@ module.exports = {
 
 		// Add necessary indexes
 		await queryInterface.addIndex("user", ["email"]);
-		await queryInterface.addIndex("user", ["recipe_user_id"]);
 		await queryInterface.addIndex("brand", ["name"]);
 		await queryInterface.addIndex("car", ["model"]);
 		await queryInterface.addIndex("car", ["year"]);
