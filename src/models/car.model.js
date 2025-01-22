@@ -28,22 +28,22 @@ const Car = sequelize.define(
 			type: DataTypes.DECIMAL(10, 2),
 			allowNull: false,
 		},
-		is_sold: {
+		isSold: {
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
 			defaultValue: false,
 		},
-		created_at: {
+		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		updated_at: {
+		updatedAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		user_id: {
+		userId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {
@@ -52,7 +52,7 @@ const Car = sequelize.define(
 			},
 			onDelete: "CASCADE",
 		},
-		brand_id: {
+		brandId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {

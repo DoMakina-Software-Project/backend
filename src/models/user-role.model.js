@@ -6,9 +6,10 @@ import Role from "./role.model.js";
 const UserRole = sequelize.define(
 	"UserRole",
 	{
-		user_id: {
+		userId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			primaryKey: true,
 			references: {
 				model: User,
 				key: "id",
@@ -17,6 +18,7 @@ const UserRole = sequelize.define(
 		},
 		role: {
 			type: DataTypes.STRING(20),
+			primaryKey: true,
 			allowNull: false,
 			references: {
 				model: Role,

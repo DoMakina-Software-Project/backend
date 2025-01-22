@@ -11,29 +11,29 @@ const Promotion = sequelize.define(
 			primaryKey: true,
 			autoIncrement: true,
 		},
-		start_date: {
+		startDate: {
 			type: DataTypes.DATE,
 			allowNull: false,
 		},
-		end_date: {
+		endDate: {
 			type: DataTypes.DATE,
 			allowNull: false,
 		},
-		promotion_price: {
+		promotionPrice: {
 			type: DataTypes.DECIMAL(10, 2),
 			allowNull: false,
 		},
-		created_at: {
+		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		updated_at: {
+		updatedAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		car_id: {
+		carId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {

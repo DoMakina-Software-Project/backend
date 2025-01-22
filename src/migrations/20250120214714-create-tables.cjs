@@ -131,6 +131,12 @@ module.exports = {
 				onDelete: "CASCADE",
 			},
 		});
+		// Add the primary key (user_id, role) to the 'user_role' table
+		await queryInterface.addConstraint("user_role", {
+			fields: ["user_id", "role"],
+			type: "primary key",
+			name: "user_role_pkey",
+		});
 
 		// Create 'tokens' table
 		await queryInterface.createTable("tokens", {

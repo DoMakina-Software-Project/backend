@@ -15,7 +15,7 @@ const CarImage = sequelize.define(
 			type: DataTypes.STRING(255),
 			allowNull: false,
 		},
-		car_id: {
+		carId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {

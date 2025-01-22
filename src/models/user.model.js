@@ -31,17 +31,17 @@ const User = sequelize.define(
 			type: DataTypes.STRING(64),
 			allowNull: false,
 		},
-		is_active: {
+		isActive: {
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
 			defaultValue: true,
 		},
-		created_at: {
+		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		updated_at: {
+		updatedAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
