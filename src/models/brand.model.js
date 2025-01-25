@@ -15,16 +15,16 @@ const Brand = sequelize.define(
 			allowNull: false,
 			unique: true,
 		},
-		icon_url: {
+		iconUrl: {
 			type: DataTypes.STRING(255),
 			allowNull: false,
 		},
-		created_at: {
+		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		updated_at: {
+		updatedAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,

@@ -1,7 +1,27 @@
+import { UserService, AuthService } from "./index.js";
+
 export default {
-	login: async (req, email, password, cb) => {
+	login: async (_req, email, password, cb) => {
 		try {
-			cb(null, {});
+			const user = await UserService.getUserByEmail(email);
+			if (!user)
+				return cb(null, false, {
+					message: "Invalid email or password",
+				});
+
+			if (
+				!AuthService.comparePasswords(
+					password,
+					user.password,
+					user.salt
+				)
+			) {
+				return cb(null, false, {
+					message: "Invalid email or password",
+				});
+			}
+
+			cb(null, user);
 		} catch (error) {
 			cb(error);
 		}
@@ -10,14 +30,17 @@ export default {
 	serializeUser: async (user, done) => {
 		done(null, {
 			id: user.id,
-			roles: user.roles,
 		});
 	},
 
 	deserializeUser: async (user, done) => {
 		try {
-			const { id, roles } = user;
-			done(null, { id, roles });
+			const { id } = user;
+
+			const fetchedUser = await UserService.getUserById(id);
+			if (!fetchedUser) throw new Error("User not found");
+
+			done(null, { ...fetchedUser });
 		} catch (error) {
 			done(error);
 		}

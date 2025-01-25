@@ -2,7 +2,9 @@ import express from "express";
 import morgan from "morgan";
 import helmet from "helmet";
 import cors from "cors";
-import { FRONTEND_URL } from "./vars.js";
+import { FRONTEND_URL, COOKIES_SECRET, NODE_ENV } from "./vars.js";
+import session from "express-session";
+import passport, { sessionStore } from "./passport.js";
 
 const app = express();
 
@@ -18,5 +20,22 @@ app.use(
 
 app.use(helmet());
 app.use(morgan("dev"));
+
+app.use(
+	session({
+		secret: COOKIES_SECRET,
+		store: sessionStore,
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			secure: NODE_ENV === "production",
+			maxAge: 1000 * 60 * 60 * 24 * 14, // 14 Days
+			httpOnly: true,
+		},
+	})
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 export default app;

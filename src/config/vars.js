@@ -6,6 +6,8 @@ export const PORT = process.env.PORT || 4000;
 
 export const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
+export const COOKIES_SECRET = process.env.COOKIES_SECRET;
+
 export const DB = {
 	host: process.env.DB_HOST || "localhost",
 	port: parseInt(process.env.DB_PORT || "3306", 10),

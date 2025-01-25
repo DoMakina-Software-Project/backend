@@ -15,17 +15,17 @@ const Token = sequelize.define(
 			type: DataTypes.ENUM("password", "email"),
 			allowNull: false,
 		},
-		created_at: {
+		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		updated_at: {
+		updatedAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 		},
-		user_id: {
+		userId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {
