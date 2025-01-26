@@ -18,4 +18,11 @@ router.delete(
 	CarController.deleteCar
 );
 
+router.get(
+	"/:id",
+	CarValidator.getCar,
+	throwValidationErrors,
+	CarController.getCar
+);
+
 export default router;

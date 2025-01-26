@@ -1,6 +1,16 @@
 import { CarService } from "../../services/index.js";
 
 export default {
+	async getCar(req, res) {
+		try {
+			const id = req.params.id;
+			const cars = await CarService.getCarById(id);
+			res.status(200).json(cars);
+		} catch (error) {
+			console.error(`CarController.getCars() error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
 	async updateCar(req, res) {
 		try {
 			const { id } = req.params;
