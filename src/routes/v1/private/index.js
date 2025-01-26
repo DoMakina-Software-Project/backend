@@ -1,9 +1,8 @@
 import { Router } from "express";
+import CarsRoute from "./cars.route.js";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-	res.send("Hello from private route");
-});
+router.use("/cars", CarsRoute);
 
 export default router;
