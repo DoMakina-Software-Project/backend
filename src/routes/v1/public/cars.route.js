@@ -11,4 +11,6 @@ router.get(
 	CarController.searchCars
 );
 
+router.get("/latest-promotions", CarController.getFiveLatestPromotionCars);
+
 export default router;
