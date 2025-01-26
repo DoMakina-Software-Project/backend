@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AuthValidator, throwValidationErrors } from "../validators/index.js";
-import Promotion from "../../../models/promotion.model.js";
-
-router.use("promotion-price", PromotionPriceRoute);
+import PromotionPriceRoute from "./promotion-price.route.js";
+const router = Router();
+router.use("/promotion-price", PromotionPriceRoute);
+export default router;
