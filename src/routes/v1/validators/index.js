@@ -1,5 +1,6 @@
 import { validationResult } from "express-validator";
 export { default as AuthValidator } from "./auth.validator.js";
+export { default as PromotionPriceValidator } from "./promotion-price.validator.js";
 export { default as CarValidator } from "./car.validator.js";
 
 export const throwValidationErrors = (req, res, next) => {
