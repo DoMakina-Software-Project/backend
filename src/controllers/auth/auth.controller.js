@@ -62,7 +62,6 @@ export default {
 			}
 
 			if (!user.isActive) {
-				// Send email verification token
 			}
 
 			passport.authenticate("local", (err, user) => {

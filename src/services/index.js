@@ -6,3 +6,5 @@ export { default as UserRoleService } from "./user-role.service.js";
 export { default as PromotionPriceService } from "./promotion-price.service.js";
 export { default as BrandService } from "./brand.service.js";
 export { default as PromotionService } from "./promotion.service.js";
+export { default as CarService } from "./car.services.js";
+export { default as TokenService } from "./token.service.js";
