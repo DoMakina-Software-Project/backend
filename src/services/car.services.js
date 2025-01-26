@@ -1,5 +1,6 @@
 import { CarModel } from "../models/index.js";
 import { Op } from "sequelize";
+import { PromotionService } from "./index.js";
 
 const CarService = {
 	async getCarById(id) {
@@ -110,6 +111,26 @@ const CarService = {
 			throw new Error(
 				"Unable to delete the car. Please try again later."
 			);
+		}
+	},
+	async getFiveLatestPromotionCars() {
+		try {
+			const promotions = await PromotionService.getFiveLatestPromotions();
+			const carIds = promotions.map((promotion) => promotion.carId);
+
+			const cars = await CarModel.findAll({
+				where: {
+					id: {
+						[Op.in]: carIds,
+					},
+				},
+			});
+			return cars.map((car) => car.toJSON());
+		} catch (error) {
+			console.error(
+				`carModelService.getFiveLatestPromotionCars() error: ${error}`
+			);
+			throw error;
 		}
 	},
 };

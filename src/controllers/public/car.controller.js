@@ -16,4 +16,15 @@ export default {
 			res.status(500).json({ message: error.message });
 		}
 	},
+
+	async getFiveLatestPromotionCars(req,res ){
+		try {
+			const cars = await CarService.getFiveLatestPromotionCars();
+			return res.status(200).json(cars);
+		} catch (error) {
+			console.error(`CarController.getFiveLatestPromotionCars error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	}
 };
+
