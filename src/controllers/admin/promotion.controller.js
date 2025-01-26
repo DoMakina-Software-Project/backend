@@ -2,7 +2,7 @@ import { PromotionService } from "../../services/index.js";
 export default {
   getPromotionById: async (req, res) => {
     try {
-      const promotionId = req.params.promotionId;
+      const { promotionId } = req.params;
       const promotion = await PromotionService.getPromotionById(promotionId);
 
       return res.status(200).json(promotion);
@@ -13,7 +13,8 @@ export default {
   },
   createPromotion: async (req, res) => {
     try {
-      const { brandId, name, description, startDate, endDate } = req.body;
+      const { brandId } = req.params;
+      const { name, description, startDate, endDate } = req.body;
       const promotion = await PromotionService.createPromotion({
         brandId,
         name,
@@ -27,13 +28,14 @@ export default {
       return res.status(201).json(promotion);
     } catch (error) {
       console.log(`createPromotion() error: ${error}`);
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: error.message });
     }
   },
   updatePromotion: async (req, res) => {
     try {
-      const promotionId = req.params.promotionId;
-      const { brandId, name, description, startDate, endDate } = req.body;
+      const { promotionId } = req.params;
+      const { brandId } = req.params;
+      const { name, description, startDate, endDate } = req.body;
       const promotion = await PromotionService.updatePromotion({
         promotionId,
         brandId,
@@ -53,7 +55,7 @@ export default {
   },
   deletePromotion: async (req, res) => {
     try {
-      const promotionId = req.params.promotionId;
+      const { promotionId } = req.params;
       const promotion = await PromotionService.deletePromotion(promotionId);
       if (!promotion)
         return res.status(404).json({ message: "Failed to delete promotion" });
