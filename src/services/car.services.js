@@ -1,6 +1,6 @@
 import { CarModel } from "../models/index.js";
 import { Op } from "sequelize";
-import { PromotionService } from "./index.js";
+import { CarImageService, PromotionService } from "./index.js";
 
 const CarService = {
 	async getCarById(id) {
@@ -21,6 +21,7 @@ const CarService = {
 		isSold,
 		userId,
 		brandId,
+		imagesUrls,
 	}) {
 		try {
 			const newCarModel = await CarModel.create({
@@ -32,8 +33,11 @@ const CarService = {
 				userId,
 				brandId,
 			});
-
-			return newCarModel ? newCarModel.toJSON() : null;
+			const images = await CarImageService.createImages(
+				newCarModel.id,
+				imagesUrls
+			);
+			return newCarModel ? { ...newCarModel.toJSON(), images } : null;
 		} catch (error) {
 			console.error(`carModelService.createCar() error: ${error}`);
 			throw error;
