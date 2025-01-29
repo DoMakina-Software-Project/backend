@@ -4,8 +4,6 @@ import { CarValidator, throwValidationErrors } from "../validators/index.js";
 
 const router = Router();
 
-router.get("/:id", CarController.getCarById);
-
 router.get(
 	"/search",
 	CarValidator.searchCars,
@@ -16,5 +14,7 @@ router.get(
 router.get("/latest-promotions", CarController.getFiveLatestPromotionCars);
 
 router.get("/home", CarController.getHomePageCars);
+
+router.get("/:id", CarController.getCarById);
 
 export default router;

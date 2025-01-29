@@ -18,7 +18,6 @@ export default {
 	async searchCars(req, res) {
 		try {
 			const { minPrice, maxPrice, brandIds, page } = req.query;
-			console.log({ minPrice, maxPrice, brandIds, page });
 			const cars = await CarService.searchCars({
 				minPrice,
 				maxPrice,
