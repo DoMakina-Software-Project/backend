@@ -119,7 +119,7 @@ export default {
 		return res.status(200).json(user);
 	},
 
-	generateEmailVerificationToken: async (req) => {
+	generateEmailVerificationToken: async (req, res) => {
 		const user = req.user;
 
 		if (!user) {
@@ -148,11 +148,15 @@ export default {
 		return res.status(200).json({ message: "Verification email sent" });
 	},
 
-	verifyEmail: async (req) => {
+	verifyEmail: async (req, res) => {
 		const { token } = req.params;
+
+		console.log(token);
 
 		const { status, message } =
 			await AuthService.verifyEmailVerificationToken(token);
+
+		console.log(status, message);
 
 		if (status !== "OK") {
 			return res.status(400).json({ message });
@@ -161,7 +165,7 @@ export default {
 		return res.status(200).json({ message: "Email verified" });
 	},
 
-	forgetPassword: async (req) => {
+	forgetPassword: async (req, res) => {
 		const { email } = req.body;
 
 		const response = await AuthService.generatePasswordResetToken(email);
@@ -173,7 +177,7 @@ export default {
 		const resetPasswordLink = `${FRONTEND_URL}/reset-password/${response.token}`;
 
 		sendEmail({
-			email,
+			to: email,
 			html: `Click <a href="${resetPasswordLink}">here</a> to reset your password.`,
 			subject: "Reset Your Password",
 		});
@@ -181,7 +185,7 @@ export default {
 		return res.status(200).json({ message: "Password reset email sent" });
 	},
 
-	resetPassword: async (req) => {
+	resetPassword: async (req, res) => {
 		const { password, token } = req.body;
 
 		const response = await AuthService.verifyResetTokenAndChangePassword(

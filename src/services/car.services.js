@@ -5,8 +5,24 @@ import { CarImageService, PromotionService } from "./index.js";
 const CarService = {
 	async getCarById(id) {
 		try {
-			const car = await CarModel.findByPk(id);
-			return car ? car.toJSON() : null;
+			const car = await CarModel.findByPk(id, {
+				include: [
+					{ model: CarImageModel },
+					{
+						model: BrandModel,
+					},
+				],
+			});
+
+			if (!car) return null;
+
+			const { CarImages, Brand, ...rest } = car.toJSON();
+
+			return {
+				...rest,
+				images: CarImages.map((image) => image.url),
+				brand: Brand.name,
+			};
 		} catch (error) {
 			console.error(`carModelService.getCarById() error: ${error}`);
 			throw error;
