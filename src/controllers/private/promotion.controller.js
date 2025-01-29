@@ -1,6 +1,6 @@
 import { PromotionService } from "../../services/index.js";
 export default {
-	getPromotionById: async (req, res) => {
+	getPromotion: async (req, res) => {
 		try {
 			const promotionId = req.params.id;
 			const promotion = await PromotionService.getPromotionById(
@@ -17,13 +17,12 @@ export default {
 	},
 	createPromotion: async (req, res) => {
 		try {
-			const { brandId, name, description, startDate, endDate } = req.body;
+			const { promotionPrice, startDate, endDate } = req.body;
 			const promotion = await PromotionService.createPromotion({
-				brandId,
-				name,
-				description,
+				carId,
 				startDate,
 				endDate,
+				promotionPrice,
 			});
 			if (!promotion)
 				return res
@@ -39,15 +38,15 @@ export default {
 	updatePromotion: async (req, res) => {
 		try {
 			const promotionId = req.params.id;
-			const { brandId, name, description, startDate, endDate } = req.body;
-			const promotion = await PromotionService.updatePromotion({
+			const { carId, promotionPrice, startDate, endDate } = req.body;
+			const promotion = await PromotionService.updatePromotion(
 				promotionId,
-				brandId,
-				name,
-				description,
-				startDate,
-				endDate,
-			});
+				{
+					promotionPrice,
+					startDate,
+					endDate,
+				}
+			);
 			if (!promotion)
 				return res
 					.status(404)

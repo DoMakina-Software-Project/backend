@@ -55,5 +55,14 @@ const BrandService = {
 			throw error;
 		}
 	},
+	getAllBrands: async () => {
+		try {
+			const brands = await BrandModel.findAll();
+			return brands.map((brand) => brand.toJSON());
+		} catch (error) {
+			console.log(`BrandService.getAllBrands() error: ${error}`);
+			throw error;
+		}
+	},
 };
 export default BrandService;

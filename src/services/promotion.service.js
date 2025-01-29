@@ -9,18 +9,11 @@ const PromotionService = {
 			throw error;
 		}
 	},
-	createPromotion: async ({
-		brandId,
-		name,
-		description,
-		startDate,
-		endDate,
-	}) => {
+	createPromotion: async ({ carId, promotionPrice, startDate, endDate }) => {
 		try {
 			const promotion = await PromotionModel.create({
-				brandId,
-				name,
-				description,
+				carId,
+				promotionPrice,
 				startDate,
 				endDate,
 			});
@@ -30,21 +23,15 @@ const PromotionService = {
 			throw error;
 		}
 	},
-	updatePromotion: async ({
+	updatePromotion: async (
 		promotionId,
-		brandId,
-		name,
-		description,
-		startDate,
-		endDate,
-	}) => {
+		{ promotionPrice, startDate, endDate }
+	) => {
 		try {
 			const promotion = await PromotionModel.findByPk(promotionId);
 			if (!promotion) throw new Error("Promotion not found");
 
-			promotion.brandId = brandId;
-			promotion.name = name;
-			promotion.description = description;
+			promotion.promotionPrice = promotionPrice;
 			promotion.startDate = startDate;
 			promotion.endDate = endDate;
 			await promotion.save();
