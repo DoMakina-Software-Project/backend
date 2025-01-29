@@ -21,30 +21,30 @@ router.post(
 	AuthController.register
 );
 
-// router.get(
-// 	"/generate-email-verification-token",
-// 	isAuth,
-// 	AuthController.generateEmailVerificationToken
-// );
+router.get(
+	"/generate-email-verification-token",
+	isAuth,
+	AuthController.generateEmailVerificationToken
+);
 
-// router.get(
-// 	"/verify-email/:token",
-// 	AuthValidator.verifyEmail,
-// 	throwValidationErrors,
-// 	AuthController.verifyEmail
-// );
+router.get(
+	"/verify-email/:token",
+	AuthValidator.verifyEmail,
+	throwValidationErrors,
+	AuthController.verifyEmail
+);
 
-// router.post(
-// 	"/forget-password",
-// 	AuthValidator.forgetPassword,
-// 	throwValidationErrors,
-// 	AuthController.forgetPassword
-// );
-// router.post(
-// 	"/reset-password",
-// 	AuthValidator.resetPassword,
-// 	throwValidationErrors,
-// 	AuthController.resetPassword
-// );
+router.post(
+	"/forget-password",
+	AuthValidator.forgetPassword,
+	throwValidationErrors,
+	AuthController.forgetPassword
+);
+router.post(
+	"/reset-password",
+	AuthValidator.resetPassword,
+	throwValidationErrors,
+	AuthController.resetPassword
+);
 
 export default router;

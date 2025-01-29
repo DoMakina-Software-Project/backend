@@ -11,6 +11,10 @@ const Token = sequelize.define(
 			primaryKey: true,
 			autoIncrement: true,
 		},
+		token: {
+			type: DataTypes.STRING(255),
+			allowNull: false,
+		},
 		type: {
 			type: DataTypes.ENUM("password", "email"),
 			allowNull: false,
