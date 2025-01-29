@@ -17,11 +17,17 @@ export default {
 
 	async searchCars(req, res) {
 		try {
-			const { minPrice, maxPrice, brandIds, page } = req.query;
+			const {
+				minPrice = 0,
+				maxPrice = 1000000,
+				brandIds = [],
+				page,
+			} = req.query;
+			const parsedBrandIds = brandIds.map((id) => Number(id));
 			const cars = await CarService.searchCars({
 				minPrice,
 				maxPrice,
-				brandIds,
+				brandIds: parsedBrandIds,
 				page,
 			});
 			return res.status(200).json(cars);

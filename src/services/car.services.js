@@ -81,20 +81,31 @@ const CarService = {
 					[Op.lte]: maxPrice,
 				};
 			}
-			if (brandIds) {
+			if (brandIds && brandIds.length > 0) {
 				where.brandId = {
 					[Op.in]: brandIds,
 				};
 			}
+			console.log(where);
 
 			const cars = await CarModel.findAndCountAll({
 				where,
 				limit,
 				offset,
+				include: [
+					{ model: CarImageModel },
+					{
+						model: BrandModel,
+					},
+				],
 			});
 
 			return {
-				results: cars.rows.map((car) => car.toJSON()),
+				results: cars.rows.map((car) => {
+					const { CarImages, Brand, ...rest } = car.toJSON();
+					const images = CarImages.map((image) => image.url);
+					return { ...rest, images, brand: Brand.name };
+				}),
 				totalItems: cars.count,
 				hasNextPage: limit * page < cars.count,
 				totalPages: Math.ceil(cars.count / limit),
