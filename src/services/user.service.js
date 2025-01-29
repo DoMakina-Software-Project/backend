@@ -52,4 +52,17 @@ export default {
 			throw error;
 		}
 	},
+
+	updateUserById: async (id, data) => {
+		try {
+			const [rowsCount] = await UserModel.update(data, {
+				where: { id },
+			});
+
+			return rowsCount > 0;
+		} catch (error) {
+			console.log(`UserService.updateUserById() error: ${error}`);
+			throw error;
+		}
+	},
 };

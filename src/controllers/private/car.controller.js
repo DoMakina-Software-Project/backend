@@ -11,6 +11,41 @@ export default {
 			res.status(500).json({ message: error.message });
 		}
 	},
+
+	async createCar(req, res) {
+		try {
+			const {
+				make,
+				model,
+				year,
+				price,
+				isSold,
+				description,
+				brandId,
+				imagesUrls,
+			} = req.body;
+			const userId = req.user.id;
+
+			const car = await CarService.createCar({
+				make,
+				description,
+				model,
+				year,
+				price,
+				isSold,
+				userId,
+				brandId,
+				imagesUrls,
+			});
+			if (!car) {
+				return res.status(400).json({ message: "Car not created." });
+			}
+			res.status(201).json(car);
+		} catch (error) {
+			console.error(`CarController.createCar() error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
 	async updateCar(req, res) {
 		try {
 			const { id } = req.params;

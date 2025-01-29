@@ -4,104 +4,99 @@ import { TokenModel } from "../models/index.js";
 const TOKEN_TYPES = ["password", "email"];
 
 const TokenService = {
-  // Create a new token
-  async createToken(userId, type) {
-    try {
-      // Validate token type
-      if (!TOKEN_TYPES.includes(type)) {
-        throw new Error(
-          `Invalid token type. Allowed values are ${TOKEN_TYPES.join(", ")}.`
-        );
-      }
+	// Create a new token
+	async createToken({ userId, type, token }) {
+		try {
+			// Validate token type
+			if (!TOKEN_TYPES.includes(type)) {
+				throw new Error(
+					`Invalid token type. Allowed values are ${TOKEN_TYPES.join(
+						", "
+					)}.`
+				);
+			}
 
-      const newToken = await TokenModel.create({ userId, type });
-      return newToken ? newToken.toJSON() : null;
-    } catch (error) {
-      console.error(`TokenService.createToken() error: ${error}`);
-      throw new Error("Unable to create token.");
-    }
-  },
+			const newToken = await TokenModel.create({ userId, type, token });
+			return newToken ? newToken.toJSON() : null;
+		} catch (error) {
+			console.error(`TokenService.createToken() error: ${error}`);
+			throw error;
+		}
+	},
 
-  // Find a token by its ID
-  async getTokenById(id) {
-    try {
-      const token = await TokenModel.findByPk(id);
-      return token ? token.toJSON() : null;
-    } catch (error) {
-      console.error(`TokenService.getTokenById() error: ${error}`);
-      throw new Error("Unable to find token by ID.");
-    }
-  },
+	// Find a token by its ID
+	async getTokenById(id) {
+		try {
+			const token = await TokenModel.findByPk(id);
+			return token ? token.toJSON() : null;
+		} catch (error) {
+			console.error(`TokenService.getTokenById() error: ${error}`);
+			throw error;
+		}
+	},
 
-  // Find all tokens by a user ID
-  async getTokensByUserId(userId) {
-    try {
-      const tokens = await TokenModel.findAll({ where: { userId } });
-      return tokens.map((token) => token.toJSON());
-    } catch (error) {
-      console.error(`TokenService.getTokensByUserId() error: ${error}`);
-      throw new Error("Unable to find tokens for the user.");
-    }
-  },
+	async getTokenByUserIdAndType(userId, type) {
+		try {
+			const token = await TokenModel.findOne({ where: { userId, type } });
+			return token ? token.toJSON() : null;
+		} catch (error) {
+			console.error(
+				`TokenService.getTokenByUserIdAndType() error: ${error}`
+			);
+			throw error;
+		}
+	},
 
-  async getTokenByUserIdAndType(userId, type) {
-    try {
-      const token = await TokenModel.findOne({ where: { userId, type } });
-      return token ? token.toJSON() : null;
-    } catch (error) {
-      console.error(`TokenService.getTokenByUserIdAndType() error: ${error}`);
-      throw new Error("Unable to find token by user ID and type.");
-    }
-  },
+	// Delete a token by its ID
+	async deleteTokenById(id) {
+		try {
+			const result = await TokenModel.destroy({
+				where: { id },
+			});
 
-  // Update a token type
-  async updateTokenType(id, newType) {
-    try {
-      // Validate new token type
-      if (!TOKEN_TYPES.includes(newType)) {
-        throw new Error(
-          `Invalid token type. Allowed values are ${TOKEN_TYPES.join(", ")}.`
-        );
-      }
+			return result > 0;
+		} catch (error) {
+			console.error(`TokenService.deleteToken() error: ${error}`);
+			throw error;
+		}
+	},
 
-      const token = await TokenModel.findByPk(id);
-      if (!token) {
-        throw new Error(`Token with ID ${id} not found.`);
-      }
+	// Delete all tokens for a user
+	async deleteTokensByUserId(userId) {
+		try {
+			const result = await TokenModel.destroy({ where: { userId } });
+			return result;
+		} catch (error) {
+			console.error(
+				`TokenService.deleteTokensByUserId() error: ${error}`
+			);
+			throw error;
+		}
+	},
 
-      token.type = newType;
-      token.updatedAt = new Date();
-      await token.save();
+	async deleteTokenByUserIdAndType(userId, type) {
+		try {
+			const result = await TokenModel.destroy({
+				where: { userId, type },
+			});
+			return result;
+		} catch (error) {
+			console.error(
+				`TokenService.deleteTokenByUserIdAndType() error: ${error}`
+			);
+			throw error;
+		}
+	},
 
-      return token.toJSON();
-    } catch (error) {
-      console.error(`TokenService.updateTokenType() error: ${error}`);
-      throw new Error("Unable to update token type.");
-    }
-  },
-
-  // Delete a token by its ID
-  async deleteToken(id) {
-    try {
-      const result = await TokenModel.destroy({ where: { id } });
-
-      return result > 0;
-    } catch (error) {
-      console.error(`TokenService.deleteToken() error: ${error}`);
-      throw new Error("Unable to delete token.");
-    }
-  },
-
-  // Delete all tokens for a user
-  async deleteTokensByUserId(userId) {
-    try {
-      const result = await TokenModel.destroy({ where: { userId } });
-      return result;
-    } catch (error) {
-      console.error(`TokenService.deleteTokensByUserId() error: ${error}`);
-      throw new Error("Unable to delete tokens for the user.");
-    }
-  },
+	async getTokenByToken(token) {
+		try {
+			const newToken = await TokenModel.findOne({ where: { token } });
+			return newToken ? newToken.toJSON() : null;
+		} catch (error) {
+			console.error(`TokenService.getTokenByToken() error: ${error}`);
+			throw error;
+		}
+	},
 };
 
 export default TokenService;

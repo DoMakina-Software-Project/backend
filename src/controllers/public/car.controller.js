@@ -17,14 +17,25 @@ export default {
 		}
 	},
 
-	async getFiveLatestPromotionCars(req,res ){
+	async getFiveLatestPromotionCars(_, res) {
 		try {
 			const cars = await CarService.getFiveLatestPromotionCars();
 			return res.status(200).json(cars);
 		} catch (error) {
-			console.error(`CarController.getFiveLatestPromotionCars error: ${error}`);
+			console.error(
+				`CarController.getFiveLatestPromotionCars error: ${error}`
+			);
 			res.status(500).json({ message: error.message });
 		}
-	}
-};
+	},
 
+	async getHomePageCars(_, res) {
+		try {
+			const cars = await CarService.getHomePageCars();
+			return res.status(200).json(cars);
+		} catch (error) {
+			console.error(`CarController.getHomePageCars error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
+};

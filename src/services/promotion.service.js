@@ -1,3 +1,4 @@
+import sequelize from "../config/db.js";
 import { PromotionModel } from "../models/index.js";
 const PromotionService = {
 	getPromotionById: async (promotionId) => {
@@ -64,6 +65,22 @@ const PromotionService = {
 		} catch (error) {
 			console.log(
 				`PromotionService.getFiveLatestPromotions() error: ${error}`
+			);
+			throw error;
+		}
+	},
+
+	getRandomPromotions: async (limit = 6) => {
+		try {
+			const promotions = await PromotionModel.findAll({
+				order: sequelize.random(),
+				limit,
+			});
+
+			return promotions.map((promotion) => promotion.toJSON());
+		} catch (error) {
+			console.log(
+				`PromotionService.getRandomPromotions() error: ${error}`
 			);
 			throw error;
 		}
