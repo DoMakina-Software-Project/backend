@@ -124,8 +124,8 @@ const CarService = {
 
 			const cars = await CarModel.findAll({
 				where: {
-					id: {
-						id: carIds,
+					Id: {
+						[Op.in]: carIds,
 					},
 				},
 				include: [{ model: CarImageModel }],
