@@ -126,17 +126,24 @@ const CarService = {
 
 			const cars = await CarModel.findAll({
 				where: {
-					Id: {
+					id: {
 						[Op.in]: carIds,
 					},
+					isSold: false,
 				},
-				include: [{ model: CarImageModel }],
+				include: [
+					{ model: CarImageModel },
+					{
+						model: BrandModel,
+					},
+				],
 			});
 			return cars.map((car) => {
-				const { CarImages, ...rest } = car.toJSON();
+				const { CarImages, Brand, ...rest } = car.toJSON();
+
 				const images = CarImages.map((image) => image.url);
-				console.log(images);
-				return { ...rest, images };
+
+				return { ...rest, images, brand: Brand.name };
 			});
 		} catch (error) {
 			console.error(
