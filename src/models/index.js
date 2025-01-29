@@ -17,6 +17,8 @@ UserRoleModel.belongsTo(UserModel, {
 
 RoleModel.hasMany(UserRoleModel, { foreignKey: "role" });
 UserRoleModel.belongsTo(RoleModel, { foreignKey: "role" });
+CarModel.hasMany(CarImageModel, { foreignKey: "carId" });
+CarImageModel.belongsTo(CarModel, { foreignKey: "carId" });
 
 export {
 	BrandModel,

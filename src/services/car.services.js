@@ -1,4 +1,4 @@
-import { CarModel } from "../models/index.js";
+import { CarModel, CarImageModel } from "../models/index.js";
 import { Op } from "sequelize";
 import { CarImageService, PromotionService } from "./index.js";
 
@@ -125,11 +125,17 @@ const CarService = {
 			const cars = await CarModel.findAll({
 				where: {
 					id: {
-						[Op.in]: carIds,
+						id: carIds,
 					},
 				},
+				include: [{ model: CarImageModel }],
 			});
-			return cars.map((car) => car.toJSON());
+			return cars.map((car) => {
+				const { CarImages, ...rest } = car.toJSON();
+				const images = CarImages.map((image) => image.url);
+				console.log(images);
+				return { ...rest, images };
+			});
 		} catch (error) {
 			console.error(
 				`carModelService.getFiveLatestPromotionCars() error: ${error}`
