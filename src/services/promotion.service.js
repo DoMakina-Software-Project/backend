@@ -1,6 +1,8 @@
 import sequelize from "../config/db.js";
 import { PromotionModel } from "../models/index.js";
 import PromotionPriceService from "./promotion-price.service.js";
+import { Op } from "sequelize";
+
 const PromotionService = {
 	getPromotionById: async (promotionId) => {
 		try {
@@ -87,6 +89,11 @@ const PromotionService = {
 	getFiveLatestPromotions: async () => {
 		try {
 			const promotions = await PromotionModel.findAll({
+				where: {
+					endDate: {
+						[Op.gte]: new Date(),
+					},
+				},
 				limit: 5,
 				order: [["createdAt", "DESC"]],
 			});
@@ -101,6 +108,11 @@ const PromotionService = {
 	getRandomPromotions: async (limit = 6) => {
 		try {
 			const promotions = await PromotionModel.findAll({
+				where: {
+					endDate: {
+						[Op.gte]: new Date(),
+					},
+				},
 				order: sequelize.random(),
 				limit,
 			});

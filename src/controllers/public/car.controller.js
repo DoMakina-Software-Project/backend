@@ -58,4 +58,15 @@ export default {
 			res.status(500).json({ message: error.message });
 		}
 	},
+	async getCarsByIds(req, res) {
+		try {
+			const { ids = [] } = req.query;
+			const parsedIds = ids.map((id) => Number(id));
+			const cars = await CarService.getCarsByIds(parsedIds);
+			return res.status(200).json(cars);
+		} catch (error) {
+			console.error(`CarController.getCarsByIds error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
 };

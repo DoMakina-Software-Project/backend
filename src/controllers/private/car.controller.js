@@ -14,9 +14,9 @@ export default {
 
 	async createCar(req, res) {
 		try {
-			const { model, year, price, description, brandId, imagesUrls } =
-				req.body;
+			const { model, year, price, description, brandId } = req.body;
 			const userId = req.user.id;
+			const imagesUrls = req.uploadedImages;
 
 			const car = await CarService.createCar({
 				description,
@@ -37,6 +37,7 @@ export default {
 			res.status(500).json({ message: error.message });
 		}
 	},
+
 	async updateCar(req, res) {
 		try {
 			const { id } = req.params;
@@ -73,6 +74,17 @@ export default {
 			res.status(200).json(result);
 		} catch (error) {
 			console.error(`CarController.deleteCar() error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
+	async getUserCars(req, res) {
+		try {
+			const userId = req.user.id;
+
+			const cars = await CarService.getUserCars(userId);
+			res.status(200).json(cars);
+		} catch (error) {
+			console.error(`CarController.getUserCars() error: ${error}`);
 			res.status(500).json({ message: error.message });
 		}
 	},

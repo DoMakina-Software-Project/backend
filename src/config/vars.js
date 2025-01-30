@@ -26,3 +26,15 @@ export const MAIL = {
 	pass: process.env.MAIL_PASSWORD || "your_mail_password",
 	from: process.env.MAIL_FROM || "your_mail_from",
 };
+
+export const MINIO = {
+	endPoint: process.env.MINIO_ENDPOINT || "localhost",
+	port: parseInt(process.env.MINIO_PORT || "9000", 10),
+	useSSL: process.env.MINIO_USE_SSL === "true",
+	accessKey: process.env.MINIO_ACCESS_KEY || "access_key",
+	secretKey: process.env.MINIO_SECRET_KEY || "secret_key",
+};
+
+export const MINIO_PUBLIC_URL = `${MINIO.useSSL ? "https" : "http"}://${
+	MINIO.endPoint
+}:${MINIO.port}`;
