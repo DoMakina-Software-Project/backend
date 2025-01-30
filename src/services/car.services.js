@@ -1,4 +1,9 @@
-import { CarModel, CarImageModel, BrandModel } from "../models/index.js";
+import {
+	CarModel,
+	CarImageModel,
+	BrandModel,
+	PromotionModel,
+} from "../models/index.js";
 import { Op } from "sequelize";
 import { CarImageService, PromotionService } from "./index.js";
 
@@ -276,13 +281,21 @@ const CarService = {
 					{
 						model: BrandModel,
 					},
+					{
+						model: PromotionModel,
+					},
 				],
 			});
 
 			return cars.map((car) => {
-				const { CarImages, Brand, ...rest } = car.toJSON();
+				const { CarImages, Brand, Promotions, ...rest } = car.toJSON();
 				const images = CarImages.map((image) => image.url);
-				return { ...rest, images, brand: Brand.name };
+				return {
+					...rest,
+					images,
+					brand: Brand.name,
+					promoted: Promotions.length > 0,
+				};
 			});
 		} catch (error) {
 			console.error(`carModelService.getUserCars() error: ${error}`);

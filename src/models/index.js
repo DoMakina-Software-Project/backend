@@ -24,6 +24,9 @@ CarImageModel.belongsTo(CarModel, { foreignKey: "carId" });
 BrandModel.hasMany(CarModel, { foreignKey: "brandId" });
 CarModel.belongsTo(BrandModel, { foreignKey: "brandId" });
 
+CarModel.hasMany(PromotionModel, { foreignKey: "carId" });
+PromotionModel.belongsTo(CarModel, { foreignKey: "carId" });
+
 export {
 	BrandModel,
 	CarModel,

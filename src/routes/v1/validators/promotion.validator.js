@@ -5,7 +5,7 @@ export default {
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
 	],
 	createPromotion: [
-		body("carId").isInt().withMessage("CarID must be a number"),
+		body("carId").isInt().withMessage("CarID must be a number").toInt(),
 		body("promotionDays")
 			.isInt()
 			.withMessage("Promotion days must be a number"),
