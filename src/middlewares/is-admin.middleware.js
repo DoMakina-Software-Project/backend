@@ -8,10 +8,11 @@ const isAdmin = (req, res, next) => {
 
 	if (!user) return res.status(401).json({ message: "Unauthenticated" });
 
-	if (!user.roles.includes("admin"))
-		return res.status(403).json({ message: "Unauthorized" });
+	if (user.roles.includes("admin") || user.roles.includes("superadmin")) {
+		return next();
+	}
 
-	return next();
+	return res.status(403).json({ message: "Unauthorized" });
 };
 
 export default isAdmin;
