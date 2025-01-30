@@ -13,6 +13,10 @@ export default {
 			const numberOfAdmins = await UserRoleService.getCountOfUsersByRole(
 				"admin"
 			);
+
+			const numberOfSuperAdmins =
+				await UserRoleService.getCountOfUsersByRole("superadmin");
+
 			const numberOfCars = await CarService.getCountOfCars();
 
 			const numberOfSoldCars = await CarService.getCountOfSoldCars();
@@ -26,7 +30,7 @@ export default {
 			const topFiveBrands = await BrandService.getTopFiveBrands();
 			return {
 				numberOfUser,
-				numberOfAdmins,
+				numberOfAdmins: numberOfAdmins + numberOfSuperAdmins,
 
 				numberOfCars,
 				numberOfSoldCars,

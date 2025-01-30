@@ -1,4 +1,4 @@
-import { BrandModel } from "../models/index.js";
+import { BrandModel, CarModel } from "../models/index.js";
 import sequelize from "../config/db.js";
 
 const BrandService = {
@@ -46,8 +46,19 @@ const BrandService = {
 
 	deleteBrand: async (brandId) => {
 		try {
-			const brand = await BrandModel.findByPk(brandId);
+			const brand = await BrandModel.findByPk(brandId, {
+				include: [
+					{
+						model: CarModel,
+					},
+				],
+			});
+
 			if (!brand) throw new Error("Brand not found");
+
+			if (brand.Cars.length > 0) {
+				throw new Error("Brand has associated cars");
+			}
 
 			await brand.destroy();
 			return brand.toJSON();
@@ -103,4 +114,3 @@ const BrandService = {
 	},
 };
 export default BrandService;
- 
