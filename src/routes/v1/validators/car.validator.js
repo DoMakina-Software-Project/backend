@@ -23,12 +23,12 @@ export default {
 	],
 	searchCars: [
 		query("minPrice")
-			.optional()
+			.optional({ values: "falsy" })
 			.isFloat()
 			.withMessage("minPrice must be a number")
 			.toFloat(),
 		query("maxPrice")
-			.optional()
+			.optional({ values: "falsy" })
 			.isFloat()
 			.withMessage("maxPrice must be a number")
 			.toFloat(),
@@ -37,14 +37,22 @@ export default {
 			.isArray()
 			.withMessage("brandIds must be an array")
 			.custom((value) => {
-				if (
-					value.length >= 0 &&
-					value.every((id) => typeof id === "number")
-				) {
-					return true;
+				if (!Array.isArray(value)) {
+					throw new Error("brandIds must be an array");
 				}
-				throw new Error("brandIds must be an array of numbers");
+
+				value.map((id) => {
+					if (typeof id === "string" && /^\d+$/.test(id)) {
+						return Number(id); // Convert numeric strings to numbers
+					} else if (typeof id !== "number") {
+						throw new Error("brandIds must be an array of numbers");
+					}
+					return id;
+				});
+
+				return true;
 			}),
+
 		query("page")
 			.optional()
 			.isInt()

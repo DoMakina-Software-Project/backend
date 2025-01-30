@@ -5,8 +5,24 @@ import { CarImageService, PromotionService } from "./index.js";
 const CarService = {
 	async getCarById(id) {
 		try {
-			const car = await CarModel.findByPk(id);
-			return car ? car.toJSON() : null;
+			const car = await CarModel.findByPk(id, {
+				include: [
+					{ model: CarImageModel },
+					{
+						model: BrandModel,
+					},
+				],
+			});
+
+			if (!car) return null;
+
+			const { CarImages, Brand, ...rest } = car.toJSON();
+
+			return {
+				...rest,
+				images: CarImages.map((image) => image.url),
+				brand: Brand.name,
+			};
 		} catch (error) {
 			console.error(`carModelService.getCarById() error: ${error}`);
 			throw error;
@@ -65,20 +81,31 @@ const CarService = {
 					[Op.lte]: maxPrice,
 				};
 			}
-			if (brandIds) {
+			if (brandIds && brandIds.length > 0) {
 				where.brandId = {
 					[Op.in]: brandIds,
 				};
 			}
+			console.log(where);
 
 			const cars = await CarModel.findAndCountAll({
 				where,
 				limit,
 				offset,
+				include: [
+					{ model: CarImageModel },
+					{
+						model: BrandModel,
+					},
+				],
 			});
 
 			return {
-				results: cars.rows.map((car) => car.toJSON()),
+				results: cars.rows.map((car) => {
+					const { CarImages, Brand, ...rest } = car.toJSON();
+					const images = CarImages.map((image) => image.url);
+					return { ...rest, images, brand: Brand.name };
+				}),
 				totalItems: cars.count,
 				hasNextPage: limit * page < cars.count,
 				totalPages: Math.ceil(cars.count / limit),
@@ -126,17 +153,24 @@ const CarService = {
 
 			const cars = await CarModel.findAll({
 				where: {
-					Id: {
+					id: {
 						[Op.in]: carIds,
 					},
+					isSold: false,
 				},
-				include: [{ model: CarImageModel }],
+				include: [
+					{ model: CarImageModel },
+					{
+						model: BrandModel,
+					},
+				],
 			});
 			return cars.map((car) => {
-				const { CarImages, ...rest } = car.toJSON();
+				const { CarImages, Brand, ...rest } = car.toJSON();
+
 				const images = CarImages.map((image) => image.url);
-				console.log(images);
-				return { ...rest, images };
+
+				return { ...rest, images, brand: Brand.name };
 			});
 		} catch (error) {
 			console.error(

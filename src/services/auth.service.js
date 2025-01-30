@@ -2,7 +2,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { UserService, TokenService } from "./index.js";
 import { JWT_SECRET } from "../config/vars.js";
-export default {
+const AuthService = {
 	comparePasswords: (password, hash, salt) => {
 		const hashVerify = crypto
 			.pbkdf2Sync(password, salt, 10000, 64, "sha512")
@@ -157,6 +157,8 @@ export default {
 			};
 		}
 
+		console.log("passed jwt verify");
+
 		try {
 			const decoded = jwt.decode(token);
 
@@ -166,6 +168,8 @@ export default {
 					message: "Invalid token",
 				};
 			}
+
+			console.log("decoded", decoded);
 
 			const { id } = decoded;
 
@@ -190,7 +194,7 @@ export default {
 				"email"
 			);
 
-			if (emailToken.token !== token) {
+			if (emailToken?.token !== token) {
 				return {
 					status: "INVALID_TOKEN",
 					message: "Invalid token",
@@ -387,14 +391,14 @@ export default {
 				"password"
 			);
 
-			if (existingToken.token !== token) {
+			if (existingToken?.token !== token) {
 				return {
 					status: "INVALID_TOKEN",
 					message: "Invalid token",
 				};
 			}
 
-			const { salt, hash } = this.saltAndHashPassword(password);
+			const { salt, hash } = AuthService.saltAndHashPassword(password);
 
 			const updatedUser = await UserService.updateUserById(id, {
 				password: hash,
@@ -434,3 +438,5 @@ export default {
 		}
 	},
 };
+
+export default AuthService;

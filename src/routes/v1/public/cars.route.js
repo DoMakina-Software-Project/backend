@@ -15,4 +15,6 @@ router.get("/latest-promotions", CarController.getFiveLatestPromotionCars);
 
 router.get("/home", CarController.getHomePageCars);
 
+router.get("/:id", CarController.getCarById);
+
 export default router;
