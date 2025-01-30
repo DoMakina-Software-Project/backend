@@ -19,7 +19,6 @@ export default {
 			const price = req.body.price;
 			const newPromotionPrice =
 				await PromotionPriceService.createPromotionPrice({
-					promotionId: 1,
 					price,
 				});
 			if (!newPromotionPrice) {
@@ -37,7 +36,6 @@ export default {
 			const price = req.body.price;
 			const newPromotionPrice =
 				await PromotionPriceService.updatePromotionPrice({
-					promotionId: 1,
 					price,
 				});
 			if (!newPromotionPrice) {
@@ -45,7 +43,9 @@ export default {
 					.status(404)
 					.json({ message: "Promotion price not found" });
 			}
-			return res.status(200).json(newPromotionPrice);
+			return res.status(200).json({
+				message: "Promotion price updated",
+			});
 		} catch (error) {
 			return res.status(500).json({ message: error.message });
 		}

@@ -28,17 +28,13 @@ const PromotionPriceService = {
 		}
 	},
 
-	createPromotionPrice: async ({ promotionId, price }) => {
+	createPromotionPrice: async ({ price }) => {
 		try {
-			const existingPromotionPrice =
-				await PromotionPriceService.getPromotionPriceByPromotionId(
-					promotionId
-				);
-			if (existingPromotionPrice)
-				throw new Error("Promotion price already exists");
+			await PromotionPriceModel.destroy({
+				truncate: true,
+			});
 
 			const promotionPrice = await PromotionPriceModel.create({
-				promotionId,
 				price,
 			});
 			return promotionPrice ? promotionPrice.toJSON() : null;
@@ -49,11 +45,9 @@ const PromotionPriceService = {
 			throw error;
 		}
 	},
-	updatePromotionPrice: async ({ promotionId, price }) => {
+	updatePromotionPrice: async ({ price }) => {
 		try {
-			const promotionPrice = await PromotionPriceModel.findByPk(
-				promotionId
-			);
+			const promotionPrice = await PromotionPriceModel.findOne();
 			if (!promotionPrice) throw new Error("Promotion price not found");
 
 			promotionPrice.price = price;
