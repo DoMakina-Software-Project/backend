@@ -35,6 +35,18 @@ const UserRoleService = {
 			throw error;
 		}
 	},
+
+	getCountOfUsersByRole: async (role) => {
+		try {
+			const count = await UserRoleModel.count({ where: { role } });
+			return count;
+		} catch (error) {
+			console.log(
+				`UserRoleService.getCountOfUsersByRole() error: ${error}`
+			);
+			throw error;
+		}
+	},
 };
 
 export default UserRoleService;

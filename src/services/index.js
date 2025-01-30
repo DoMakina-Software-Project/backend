@@ -9,3 +9,4 @@ export { default as PromotionService } from "./promotion.service.js";
 export { default as CarService } from "./car.services.js";
 export { default as TokenService } from "./token.service.js";
 export { default as CarImageService } from "./car-images.service.js";
+export { default as DashboardService } from "./dashboard.service.js";

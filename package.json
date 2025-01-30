@@ -9,12 +9,14 @@
 		"dev": "nodemon src/index.js",
 		"migrate": "sequelize-cli db:migrate",
 		"undo-migrate": "sequelize-cli db:migrate:undo",
-		"undo-all-migrate": "sequelize-cli db:migrate:undo:all"
+		"undo-all-migrate": "sequelize-cli db:migrate:undo:all",
+		"create-super-admin": "node src/cli/create-super-admin.js create-admin"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"commander": "^13.1.0",
 		"connect-session-sequelize": "^7.1.7",
 		"cors": "^2.8.5",
 		"crypto": "^1.0.1",
