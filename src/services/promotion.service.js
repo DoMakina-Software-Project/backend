@@ -11,32 +11,31 @@ const PromotionService = {
 			throw error;
 		}
 	},
-	createPromotion: async ({ carId, startDate, endDate }) => {
+	createPromotion: async ({ carId, promotionDays }) => {
 		try {
+			// Get the base promotion price
 			const promotionPrice =
 				await PromotionPriceService.getPromotionPrice();
 			if (!promotionPrice) throw new Error("Promotion price not found");
 
 			const dayPrice = promotionPrice.price;
 
-			// Calculate the number of promotion days
-			const start = new Date(startDate);
-			const end = new Date(endDate);
-			const promotionDays = Math.max(
-				0,
-				(end - start) / (1000 * 60 * 60 * 24)
-			); // Convert milliseconds to days
+			// Set start date to the current date
+			const startDate = new Date();
 
-			// Calculate total price
+			// Calculate end date by adding promotionDays
+			const endDate = new Date();
+			endDate.setDate(startDate.getDate() + promotionDays); // Adds the given days to the current date
+
+			// Calculate total promotion price
 			const totalPrice = promotionDays * dayPrice;
 
 			// Store in the database
 			const promotion = await PromotionModel.create({
 				carId,
-				promotionPrice: dayPrice,
+				promotionPrice: totalPrice,
 				startDate,
 				endDate,
-				totalPrice, // Save total price
 			});
 
 			return promotion ? promotion.toJSON() : null;
@@ -45,6 +44,7 @@ const PromotionService = {
 			throw error;
 		}
 	},
+
 	updatePromotion: async (
 		promotionId,
 		{ promotionPrice, startDate, endDate }

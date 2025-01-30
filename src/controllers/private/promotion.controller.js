@@ -17,12 +17,10 @@ export default {
 	},
 	createPromotion: async (req, res) => {
 		try {
-			const { promotionPrice, startDate, endDate } = req.body;
+			const { carId, promotionDays } = req.body;
 			const promotion = await PromotionService.createPromotion({
 				carId,
-				startDate,
-				endDate,
-				promotionPrice,
+				promotionDays,
 			});
 			if (!promotion)
 				return res
