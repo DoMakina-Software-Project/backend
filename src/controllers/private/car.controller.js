@@ -14,28 +14,19 @@ export default {
 
 	async createCar(req, res) {
 		try {
-			const {
-				make,
-				model,
-				year,
-				price,
-				isSold,
-				description,
-				brandId,
-				imagesUrls,
-			} = req.body;
+			const { model, year, price, description, brandId, imagesUrls } =
+				req.body;
 			const userId = req.user.id;
 
 			const car = await CarService.createCar({
-				make,
 				description,
 				model,
 				year,
 				price,
-				isSold,
 				userId,
 				brandId,
 				imagesUrls,
+				isSold: false,
 			});
 			if (!car) {
 				return res.status(400).json({ message: "Car not created." });

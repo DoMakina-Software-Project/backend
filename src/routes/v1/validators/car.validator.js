@@ -6,6 +6,15 @@ export default {
 		body("price").isFloat().withMessage("Price must be a number"),
 		body("isSold").isBoolean().withMessage("isSold must be a boolean"),
 	],
+	createCar: [
+		body("description")
+			.isString()
+			.withMessage("description must be a string"),
+		body("brandId").isNumeric().withMessage("brandId must be a number"),
+		body("model").isString().withMessage("model must be a string"),
+		body("price").isFloat().withMessage("price must be a number"),
+		body("year").isInt().withMessage("year must be a number"),
+	],
 	deleteCar: [
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
 	],

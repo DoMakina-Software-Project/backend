@@ -8,7 +8,7 @@ import {
 const router = Router();
 router.get("/", PromotionPriceController.getPromotionPrice);
 router.post(
-	"/:id",
+	"/",
 	PromotionPriceValidator.createPromotionPrice,
 	throwValidationErrors,
 	PromotionPriceController.createPromotionPrice

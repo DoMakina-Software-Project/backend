@@ -4,6 +4,12 @@ import { CarValidator, throwValidationErrors } from "../validators/index.js";
 
 const router = Router();
 
+router.post(
+	"/",
+	CarValidator.createCar,
+	throwValidationErrors,
+	CarController.createCar
+);
 router.put(
 	"/:id",
 	CarValidator.updateCar,

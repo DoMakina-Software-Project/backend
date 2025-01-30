@@ -3,7 +3,7 @@ export default {
 	getPromotionPrice: async (req, res) => {
 		try {
 			const promotionPrice =
-				await PromotionPriceService.getPromotionPriceByPromotionId(1);
+				await PromotionPriceService.getPromotionPrice();
 			if (!promotionPrice) {
 				return res
 					.status(404)
@@ -52,14 +52,15 @@ export default {
 	},
 	deletePromotionPrice: async (req, res) => {
 		try {
+			const id = req.params.id;
 			const promotionPrice =
-				await PromotionPriceService.deletePromotionPrice(1);
+				await PromotionPriceService.deletePromotionPrice(id);
 			if (!promotionPrice) {
 				return res
 					.status(404)
 					.json({ message: "Promotion price not found" });
 			}
-			return res.status(200).json(promotionPrice);
+			return res.status(200).json({ message: "Promotion price deleted" });
 		} catch (error) {
 			return res.status(500).json({ message: error.message });
 		}

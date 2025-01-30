@@ -1,5 +1,6 @@
 import sequelize from "../config/db.js";
 import { PromotionModel } from "../models/index.js";
+import PromotionPriceService from "./promotion-price.service.js";
 const PromotionService = {
 	getPromotionById: async (promotionId) => {
 		try {
@@ -10,14 +11,34 @@ const PromotionService = {
 			throw error;
 		}
 	},
-	createPromotion: async ({ carId, promotionPrice, startDate, endDate }) => {
+	createPromotion: async ({ carId, startDate, endDate }) => {
 		try {
+			const promotionPrice =
+				await PromotionPriceService.getPromotionPrice();
+			if (!promotionPrice) throw new Error("Promotion price not found");
+
+			const dayPrice = promotionPrice.price;
+
+			// Calculate the number of promotion days
+			const start = new Date(startDate);
+			const end = new Date(endDate);
+			const promotionDays = Math.max(
+				0,
+				(end - start) / (1000 * 60 * 60 * 24)
+			); // Convert milliseconds to days
+
+			// Calculate total price
+			const totalPrice = promotionDays * dayPrice;
+
+			// Store in the database
 			const promotion = await PromotionModel.create({
 				carId,
-				promotionPrice,
+				promotionPrice: dayPrice,
 				startDate,
 				endDate,
+				totalPrice, // Save total price
 			});
+
 			return promotion ? promotion.toJSON() : null;
 		} catch (error) {
 			console.log(`PromotionService.createPromotion() error: ${error}`);
@@ -31,10 +52,18 @@ const PromotionService = {
 		try {
 			const promotion = await PromotionModel.findByPk(promotionId);
 			if (!promotion) throw new Error("Promotion not found");
-
+			const start = new Date(startDate);
+			const end = new Date(endDate);
+			const promotionDays = Math.max(
+				0,
+				(end - start) / (1000 * 60 * 60 * 24)
+			);
+			const totalPrice = promotionDays * promotionPrice;
 			promotion.promotionPrice = promotionPrice;
 			promotion.startDate = startDate;
 			promotion.endDate = endDate;
+			promotion.totalPrice = totalPrice;
+
 			await promotion.save();
 			return promotion.toJSON();
 		} catch (error) {
@@ -69,7 +98,6 @@ const PromotionService = {
 			throw error;
 		}
 	},
-
 	getRandomPromotions: async (limit = 6) => {
 		try {
 			const promotions = await PromotionModel.findAll({
