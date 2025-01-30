@@ -125,5 +125,110 @@ const PromotionService = {
 			throw error;
 		}
 	},
+	getTotalRevenue: async () => {
+		try {
+			const promotions = await PromotionModel.findAll();
+			const totalRevenue = promotions.reduce(
+				(sum, promo) => sum + parseFloat(promo.promotionPrice),
+				0
+			);
+			return totalRevenue;
+		} catch (error) {
+			console.log(`PromotionService.getTotalRevenue() error: ${error}`);
+			throw error;
+		}
+	},
+
+	getYearlyRevenue: async () => {
+		try {
+			const startOfYear = new Date();
+			startOfYear.setMonth(0, 1);
+			startOfYear.setHours(0, 0, 0, 0);
+
+			const promotions = await PromotionModel.findAll({
+				where: {
+					startDate: { [Op.gte]: startOfYear },
+				},
+			});
+
+			const yearlyRevenue = promotions.reduce(
+				(sum, promo) => sum + parseFloat(promo.promotionPrice),
+				0
+			);
+			return yearlyRevenue;
+		} catch (error) {
+			console.log(`PromotionService.getYearlyRevenue() error: ${error}`);
+			throw error;
+		}
+	},
+
+	getMonthlyRevenue: async () => {
+		try {
+			const startOfMonth = new Date();
+			startOfMonth.setDate(1);
+			startOfMonth.setHours(0, 0, 0, 0);
+
+			const promotions = await PromotionModel.findAll({
+				where: {
+					startDate: { [Op.gte]: startOfMonth },
+				},
+			});
+
+			const monthlyRevenue = promotions.reduce(
+				(sum, promo) => sum + parseFloat(promo.promotionPrice),
+				0
+			);
+			return monthlyRevenue;
+		} catch (error) {
+			console.log(`PromotionService.getMonthlyRevenue() error: ${error}`);
+			throw error;
+		}
+	},
+
+	getWeeklyRevenue: async () => {
+		try {
+			const startOfWeek = new Date();
+			const dayOfWeek = startOfWeek.getDay();
+			startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);
+			startOfWeek.setHours(0, 0, 0, 0);
+
+			const promotions = await PromotionModel.findAll({
+				where: {
+					startDate: { [Op.gte]: startOfWeek },
+				},
+			});
+
+			const weeklyRevenue = promotions.reduce(
+				(sum, promo) => sum + parseFloat(promo.promotionPrice),
+				0
+			);
+			return weeklyRevenue;
+		} catch (error) {
+			console.log(`PromotionService.getWeeklyRevenue() error: ${error}`);
+			throw error;
+		}
+	},
+
+	getDailyRevenue: async () => {
+		try {
+			const startOfDay = new Date();
+			startOfDay.setHours(0, 0, 0, 0);
+
+			const promotions = await PromotionModel.findAll({
+				where: {
+					startDate: { [Op.gte]: startOfDay },
+				},
+			});
+
+			const dailyRevenue = promotions.reduce(
+				(sum, promo) => sum + parseFloat(promo.promotionPrice),
+				0
+			);
+			return dailyRevenue;
+		} catch (error) {
+			console.log(`PromotionService.getDailyRevenue() error: ${error}`);
+			throw error;
+		}
+	},
 };
 export default PromotionService;

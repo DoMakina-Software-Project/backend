@@ -302,6 +302,28 @@ const CarService = {
 			throw error;
 		}
 	},
+	getCountOfCars: async () => {
+		try {
+			const count = await CarModel.count();
+			return count;
+		} catch (error) {
+			console.log(`carModelService.getCountOfCars() error: ${error}`);
+			throw error;
+		}
+	},
+	getCountOfSoldCars: async () => {
+		try {
+			const count = await CarModel.count({
+				where: {
+					isSold: true,
+				},
+			});
+			return count;
+		} catch (error) {
+			console.log(`carModelService.getCountOfSoldCars() error: ${error}`);
+			throw error;
+		}
+	},
 };
 
 export default CarService;

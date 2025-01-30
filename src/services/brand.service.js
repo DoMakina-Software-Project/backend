@@ -1,4 +1,5 @@
 import { BrandModel } from "../models/index.js";
+import sequelize from "../config/db.js";
 
 const BrandService = {
 	getBrandById: async (brandId) => {
@@ -61,6 +62,42 @@ const BrandService = {
 			return brands.map((brand) => brand.toJSON());
 		} catch (error) {
 			console.log(`BrandService.getAllBrands() error: ${error}`);
+			throw error;
+		}
+	},
+	getBrandCount: async () => {
+		try {
+			const count = await BrandModel.count();
+			return count;
+		} catch (error) {
+			console.log(`BrandService.getBrandCount() error: ${error}`);
+			throw error;
+		}
+	},
+
+	getTopFiveBrands: async () => {
+		try {
+			const [results] = await sequelize.query(`
+				SELECT 
+					brand.id, 
+					brand.name, 
+					brand.icon_url, 
+					COUNT(car.id) AS totalCars
+				FROM brand
+				LEFT JOIN car ON brand.id = car.brand_id
+				GROUP BY brand.id
+				ORDER BY totalCars DESC
+				LIMIT 5;
+			`);
+
+			// Format the results
+			return results.map((brand) => ({
+				brand: brand.name,
+				icon_url: brand.icon_url,
+				totalCars: parseInt(brand.totalCars),
+			}));
+		} catch (error) {
+			console.log(`BrandService.getTopFiveBrands() error: ${error}`);
 			throw error;
 		}
 	},

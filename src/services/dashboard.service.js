@@ -1,4 +1,7 @@
 import { UserRoleService } from "./index.js";
+import { CarService } from "./index.js";
+import { PromotionService } from "./index.js";
+import { BrandService } from "./index.js";
 
 export default {
 	getDashboard: async () => {
@@ -10,28 +13,32 @@ export default {
 			const numberOfAdmins = await UserRoleService.getCountOfUsersByRole(
 				"admin"
 			);
+			const numberOfCars = await CarService.getCountOfCars();
 
+			const numberOfSoldCars = await CarService.getCountOfSoldCars();
+
+			const totalRevenue = await PromotionService.getTotalRevenue();
+			const yearRevenue = await PromotionService.getYearlyRevenue();
+			const monthRevenue = await PromotionService.getMonthlyRevenue();
+			const weekRevenue = await PromotionService.getWeeklyRevenue();
+			const todayRevenue = await PromotionService.getDailyRevenue();
+			const numberOfBrands = await BrandService.getBrandCount();
+			const topFiveBrands = await BrandService.getTopFiveBrands();
 			return {
 				numberOfUser,
 				numberOfAdmins,
 
-				numberOfCars: 10,
-				numberOfSoldCars: 5,
+				numberOfCars,
+				numberOfSoldCars,
 
-				totalRevenue: 1000000,
-				yearRevenue: 500000,
-				monthRevenue: 100000,
-				weekRevenue: 50000,
-				todayRevenue: 10000,
+				totalRevenue,
+				yearRevenue,
+				monthRevenue,
+				weekRevenue,
+				todayRevenue,
 
-				numberOfBrands: 5,
-				topFiveBrands: [
-					{ brand: "Toyota", icon_url: "", totalCars: 10 },
-					{ brand: "Ford", icon_url: "", totalCars: 8 },
-					{ brand: "Chevrolet", icon_url: "", totalCars: 6 },
-					{ brand: "Nissan", icon_url: "", totalCars: 4 },
-					{ brand: "Honda", icon_url: "", totalCars: 2 },
-				],
+				numberOfBrands,
+				topFiveBrands,
 			};
 		} catch (error) {
 			console.log("dashboard.service.js: getDashboard: error: ", error);
