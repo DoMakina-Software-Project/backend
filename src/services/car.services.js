@@ -301,6 +301,27 @@ const CarService = {
 			throw error;
 		}
 	},
+	async deletePromotion(id) {
+		try {
+			const car = await CarModel.findByPk(id);
+			if (!car) return false;
+
+			const promotion = await PromotionModel.findOne({
+				where: {
+					carId: id,
+				},
+			});
+
+			if (!promotion) return false;
+
+			await promotion.destroy();
+
+			return true;
+		} catch (error) {
+			console.error(`carModelService.deletePromotion() error: ${error}`);
+			throw error;
+		}
+	},
 };
 
 export default CarService;
