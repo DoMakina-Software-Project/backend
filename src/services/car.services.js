@@ -238,6 +238,32 @@ const CarService = {
 			throw error;
 		}
 	},
+	async getCarsByIds(ids) {
+		try {
+			const cars = await CarModel.findAll({
+				where: {
+					id: {
+						[Op.in]: ids,
+					},
+				},
+				include: [
+					{ model: CarImageModel },
+					{
+						model: BrandModel,
+					},
+				],
+			});
+
+			return cars.map((car) => {
+				const { CarImages, Brand, ...rest } = car.toJSON();
+				const images = CarImages.map((image) => image.url);
+				return { ...rest, images, brand: Brand.name };
+			});
+		} catch (error) {
+			console.error(`carModelService.getCarsByIds() error: ${error}`);
+			throw error;
+		}
+	},
 };
 
 export default CarService;

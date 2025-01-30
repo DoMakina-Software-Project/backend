@@ -59,4 +59,26 @@ export default {
 			.withMessage("page must be a number")
 			.toInt(),
 	],
+	getWishlistCars: [
+		query("ids")
+			.optional()
+			.isArray()
+			.withMessage("ids must be an array")
+			.custom((value) => {
+				if (!Array.isArray(value)) {
+					throw new Error("ids must be an array");
+				}
+
+				value.map((id) => {
+					if (typeof id === "string" && /^\d+$/.test(id)) {
+						return Number(id); // Convert numeric strings to numbers
+					} else if (typeof id !== "number") {
+						throw new Error("ids must be an array of numbers");
+					}
+					return id;
+				});
+
+				return true;
+			}),
+	],
 };
