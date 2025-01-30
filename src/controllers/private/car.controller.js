@@ -88,4 +88,41 @@ export default {
 			res.status(500).json({ message: error.message });
 		}
 	},
+
+	async updateIsSold(req, res) {
+		try {
+			const { id } = req.params;
+			const { isSold } = req.body;
+
+			const car = await CarService.updateCar(id, { isSold });
+			if (!car) {
+				return res
+					.status(404)
+					.json({ message: `Car with ID ${id} not found.` });
+			}
+			res.status(200).json({
+				message: `Updated successfully.`,
+			});
+		} catch (error) {
+			console.error(`CarController.updateIsSold() error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
+	async deletePromotion(req, res) {
+		try {
+			const id = req.params.id;
+			const car = await CarService.deletePromotion(id);
+			if (!car) {
+				return res
+					.status(404)
+					.json({ message: `Car with ID ${id} not found.` });
+			}
+			res.status(200).json({
+				message: `Promoted is successfully deleted.`,
+			});
+		} catch (error) {
+			console.error(`CarController.deletePromotion() error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
 };

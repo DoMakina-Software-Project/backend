@@ -35,5 +35,18 @@ router.get(
 	throwValidationErrors,
 	CarController.getCar
 );
+router.delete(
+	"/:id/promotion",
+	CarValidator.deletePromotion,
+	throwValidationErrors,
+	CarController.deletePromotion
+);
+
+router.put(
+	"/:id/is-sold",
+	CarValidator.updateIsSold,
+	throwValidationErrors,
+	CarController.updateIsSold
+);
 
 export default router;
