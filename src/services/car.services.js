@@ -125,9 +125,12 @@ const CarService = {
 			const car = await CarModel.findByPk(id);
 			if (!car) throw new Error(`Car with ID ${id} not found.`);
 
-			car.price = price;
-			car.isSold = isSold;
+			console.log({ price, isSold });
+
+			if (price !== undefined) car.price = price;
+			if (isSold !== undefined) car.isSold = isSold;
 			car.updatedAt = new Date();
+
 			await car.save();
 
 			return car.toJSON();
@@ -136,7 +139,6 @@ const CarService = {
 			throw error;
 		}
 	},
-
 	async deleteCar(id) {
 		try {
 			const result = await CarModel.destroy({
@@ -299,6 +301,27 @@ const CarService = {
 			});
 		} catch (error) {
 			console.error(`carModelService.getUserCars() error: ${error}`);
+			throw error;
+		}
+	},
+	async deletePromotion(id) {
+		try {
+			const car = await CarModel.findByPk(id);
+			if (!car) return false;
+
+			const promotion = await PromotionModel.findOne({
+				where: {
+					carId: id,
+				},
+			});
+
+			if (!promotion) return false;
+
+			await promotion.destroy();
+
+			return true;
+		} catch (error) {
+			console.error(`carModelService.deletePromotion() error: ${error}`);
 			throw error;
 		}
 	},
