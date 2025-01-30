@@ -124,9 +124,8 @@ const CarService = {
 		try {
 			const car = await CarModel.findByPk(id);
 			if (!car) throw new Error(`Car with ID ${id} not found.`);
-
-			car.price = price;
-			car.isSold = isSold;
+			if (price) car.price = price;
+			if (isSold) car.isSold = isSold;
 			car.updatedAt = new Date();
 			await car.save();
 

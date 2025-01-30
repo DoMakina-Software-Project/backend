@@ -81,4 +81,9 @@ export default {
 				return true;
 			}),
 	],
+
+	updateIsSold: [
+		param("id").isNumeric().withMessage("ID must be a number").toInt(),
+		body("isSold").isBoolean().withMessage("isSold must be a boolean"),
+	],
 };

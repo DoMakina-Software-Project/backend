@@ -36,4 +36,11 @@ router.get(
 	CarController.getCar
 );
 
+router.put(
+	"/:id/is-sold",
+	CarValidator.updateIsSold,
+	throwValidationErrors,
+	CarController.updateIsSold
+);
+
 export default router;

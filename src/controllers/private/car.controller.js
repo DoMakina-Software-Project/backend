@@ -88,4 +88,24 @@ export default {
 			res.status(500).json({ message: error.message });
 		}
 	},
+
+	async updateIsSold(req, res) {
+		try {
+			const { id } = req.params;
+			const { isSold } = req.body;
+
+			const car = await CarService.updateCar(id, { isSold });
+			if (!car) {
+				return res
+					.status(404)
+					.json({ message: `Car with ID ${id} not found.` });
+			}
+			res.status(200).json({
+				message: `Car with ID ${id} updated successfully.`,
+			});
+		} catch (error) {
+			console.error(`CarController.updateIsSold() error: ${error}`);
+			res.status(500).json({ message: error.message });
+		}
+	},
 };
