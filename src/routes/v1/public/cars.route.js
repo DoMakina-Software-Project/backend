@@ -14,7 +14,7 @@ router.get(
 	"/wishlist",
 	CarValidator.getWishlistCars,
 	throwValidationErrors,
-	CarController.getCarByIds
+	CarController.getCarsByIds
 );
 
 router.get("/latest-promotions", CarController.getFiveLatestPromotionCars);
