@@ -60,7 +60,7 @@ export default {
 	},
 	async getCarsByIds(req, res) {
 		try {
-			const { ids } = req.query;
+			const { ids = [] } = req.query;
 			const parsedIds = ids.map((id) => Number(id));
 			const cars = await CarService.getCarsByIds(parsedIds);
 			return res.status(200).json(cars);
