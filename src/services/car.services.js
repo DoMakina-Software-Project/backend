@@ -124,9 +124,13 @@ const CarService = {
 		try {
 			const car = await CarModel.findByPk(id);
 			if (!car) throw new Error(`Car with ID ${id} not found.`);
-			if (price) car.price = price;
-			if (isSold) car.isSold = isSold;
+
+			console.log({ price, isSold });
+
+			if (price !== undefined) car.price = price;
+			if (isSold !== undefined) car.isSold = isSold;
 			car.updatedAt = new Date();
+
 			await car.save();
 
 			return car.toJSON();
@@ -135,7 +139,6 @@ const CarService = {
 			throw error;
 		}
 	},
-
 	async deleteCar(id) {
 		try {
 			const result = await CarModel.destroy({
