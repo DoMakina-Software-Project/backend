@@ -157,8 +157,6 @@ const AuthService = {
 			};
 		}
 
-		console.log("passed jwt verify");
-
 		try {
 			const decoded = jwt.decode(token);
 
@@ -168,8 +166,6 @@ const AuthService = {
 					message: "Invalid token",
 				};
 			}
-
-			console.log("decoded", decoded);
 
 			const { id } = decoded;
 

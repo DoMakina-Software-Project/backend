@@ -151,12 +151,8 @@ export default {
 	verifyEmail: async (req, res) => {
 		const { token } = req.params;
 
-		console.log(token);
-
 		const { status, message } =
 			await AuthService.verifyEmailVerificationToken(token);
-
-		console.log(status, message);
 
 		if (status !== "OK") {
 			return res.status(400).json({ message });

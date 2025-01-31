@@ -91,7 +91,6 @@ const CarService = {
 					[Op.in]: brandIds,
 				};
 			}
-			console.log(where);
 
 			const cars = await CarModel.findAndCountAll({
 				where,
@@ -124,8 +123,6 @@ const CarService = {
 		try {
 			const car = await CarModel.findByPk(id);
 			if (!car) throw new Error(`Car with ID ${id} not found.`);
-
-			console.log({ price, isSold });
 
 			if (price !== undefined) car.price = price;
 			if (isSold !== undefined) car.isSold = isSold;

@@ -14,9 +14,13 @@ export default {
 	},
 	createBrand: async (req, res) => {
 		try {
-			const { brandId, name, iconUrl } = req.body;
+			const { name } = req.body;
+			const iconUrl = req.iconUrl;
+			if (!iconUrl) {
+				return res.status(400).json({ message: "Icon is required" });
+			}
+
 			const newBrand = await BrandService.createBrand({
-				brandId,
 				name,
 				iconUrl,
 			});
@@ -33,10 +37,11 @@ export default {
 	updateBrand: async (req, res) => {
 		try {
 			const brandId = req.params.id;
-			const { name, iconUrl } = req.body;
+			const { name } = req.body;
+			const iconUrl = req.iconUrl;
 
 			const newBrand = await BrandService.updateBrand({
-				brandId: brandId,
+				brandId,
 				name,
 				iconUrl,
 			});

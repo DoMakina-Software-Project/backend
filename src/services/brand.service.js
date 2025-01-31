@@ -12,13 +12,17 @@ const BrandService = {
 		}
 	},
 
-	createBrand: async ({ brandId, name, iconUrl }) => {
+	createBrand: async ({ name, iconUrl }) => {
 		try {
-			const existingBrand = await BrandService.getBrandById(brandId);
-			if (existingBrand) throw new Error("Brand already exists");
+			const existingBrand = await BrandModel.findOne({
+				where: { name },
+			});
+
+			if (existingBrand) {
+				throw new Error("Brand already exists");
+			}
 
 			const brand = await BrandModel.create({
-				brandId,
 				name,
 				iconUrl,
 			});
@@ -34,9 +38,10 @@ const BrandService = {
 			const brand = await BrandModel.findByPk(brandId);
 			if (!brand) throw new Error("Brand not found");
 
-			brand.name = name;
-			brand.iconUrl = iconUrl;
+			if (name) brand.name = name;
+			if (iconUrl) brand.iconUrl = iconUrl;
 			await brand.save();
+
 			return brand.toJSON();
 		} catch (error) {
 			console.log(`BrandService.updateBrand() error: ${error}`);
