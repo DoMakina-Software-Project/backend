@@ -7,6 +7,8 @@ const dbConfig = {
 	logging: false,
 };
 
+console.log(dbConfig);
+
 // Create the database connection
 const sequelize = new Sequelize(dbConfig);
 
