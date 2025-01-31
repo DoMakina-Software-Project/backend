@@ -47,7 +47,6 @@ const action = async () => {
 				email,
 				password: hash,
 				salt,
-				isSuperAdmin: true,
 			});
 		} else {
 			const user = await UserModel.create({
