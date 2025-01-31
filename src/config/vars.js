@@ -35,6 +35,6 @@ export const MINIO = {
 	secretKey: process.env.MINIO_SECRET_KEY || "secret_key",
 };
 
-export const MINIO_PUBLIC_URL = `${MINIO.useSSL ? "https" : "http"}://${
-	MINIO.endPoint
-}:${MINIO.port}`;
+export const MINIO_PUBLIC_URL = `${
+	MINIO.useSSL ? "https" : "http"
+}://localhost:${MINIO.port}`;
