@@ -33,7 +33,7 @@ const Brand = sequelize.define(
 	{
 		tableName: "brand",
 		underscored: true,
-		timestamps: false,
+		timestamps: true,
 	}
 );
 

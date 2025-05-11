@@ -1,9 +1,10 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import Car from "./car.model.js";
+import User from "./user.model.js";
 
-const Promotion = sequelize.define(
-	"Promotion",
+const Booking = sequelize.define(
+	"Booking",
 	{
 		id: {
 			type: DataTypes.INTEGER,
@@ -20,6 +21,15 @@ const Promotion = sequelize.define(
 			},
 			onDelete: "CASCADE",
 		},
+		clientId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			references: {
+				model: User,
+				key: "id",
+			},
+			onDelete: "CASCADE",
+		},
 		startDate: {
 			type: DataTypes.DATEONLY,
 			allowNull: false,
@@ -28,7 +38,28 @@ const Promotion = sequelize.define(
 			type: DataTypes.DATEONLY,
 			allowNull: false,
 		},
-		promotionPrice: {
+		status: {
+			type: DataTypes.ENUM(
+				"PENDING",
+				"CONFIRMED",
+				"CANCELLED",
+				"COMPLETED",
+				"REJECTED",
+				"EXPIRED"
+			),
+			allowNull: false,
+			defaultValue: "PENDING",
+		},
+		paymentStatus: {
+			type: DataTypes.ENUM("PENDING", "PAID", "REFUNDED", "FAILED"),
+			allowNull: false,
+			defaultValue: "PENDING",
+		},
+		paymentMethod: {
+			type: DataTypes.ENUM("PAYPAL", "CASH"),
+			allowNull: true,
+		},
+		totalPrice: {
 			type: DataTypes.DECIMAL(10, 2),
 			allowNull: false,
 		},
@@ -44,10 +75,10 @@ const Promotion = sequelize.define(
 		},
 	},
 	{
-		tableName: "promotion",
+		tableName: "booking",
 		underscored: true,
 		timestamps: true,
 	}
 );
 
-export default Promotion;
+export default Booking;

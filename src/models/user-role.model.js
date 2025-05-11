@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import User from "./user.model.js";
-import Role from "./role.model.js";
 
 const UserRole = sequelize.define(
 	"UserRole",
@@ -17,14 +16,9 @@ const UserRole = sequelize.define(
 			onDelete: "CASCADE",
 		},
 		role: {
-			type: DataTypes.STRING(20),
+			type: DataTypes.ENUM("CLIENT", "SELLER", "STAFF", "SUPERADMIN"),
 			primaryKey: true,
 			allowNull: false,
-			references: {
-				model: Role,
-				key: "role",
-			},
-			onDelete: "CASCADE",
 		},
 	},
 	{

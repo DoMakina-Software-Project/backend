@@ -44,7 +44,7 @@ export default {
 				email,
 				password: hash,
 				salt,
-				isActive: false,
+				status: "INACTIVE",
 			});
 
 			if (!user)
@@ -63,7 +63,7 @@ export default {
 					.json({ message: "User role could not be created" });
 			}
 
-			if (!user.isActive) {
+			if (user.status === "INACTIVE") {
 				const emailToken =
 					await AuthService.generateEmailVerificationToken(user.id);
 

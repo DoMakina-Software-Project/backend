@@ -27,7 +27,7 @@ const action = async () => {
 				{
 					model: UserRoleModel,
 					where: {
-						role: "superadmin",
+						role: "SUPERADMIN",
 					},
 				},
 			],
@@ -39,7 +39,7 @@ const action = async () => {
 			if (!isSuperAdmin) {
 				await UserRoleModel.create({
 					userId: existingUser.id,
-					role: "superadmin",
+					role: "SUPERADMIN",
 				});
 			}
 
@@ -55,12 +55,12 @@ const action = async () => {
 				salt,
 				name: "Admin",
 				surname: "Admin",
-				isActive: true,
+				status: "ACTIVE",
 			});
 
 			await UserRoleModel.create({
 				userId: user.id,
-				role: "superadmin",
+				role: "SUPERADMIN",
 			});
 		}
 

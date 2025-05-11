@@ -31,10 +31,10 @@ const User = sequelize.define(
 			type: DataTypes.STRING(64),
 			allowNull: false,
 		},
-		isActive: {
-			type: DataTypes.BOOLEAN,
+		status: {
+			type: DataTypes.ENUM("ACTIVE", "INACTIVE", "BANNED", "DELETED"),
 			allowNull: false,
-			defaultValue: true,
+			defaultValue: "INACTIVE",
 		},
 		createdAt: {
 			type: DataTypes.DATE,
@@ -50,7 +50,7 @@ const User = sequelize.define(
 	{
 		tableName: "user",
 		underscored: true,
-		timestamps: false,
+		timestamps: true,
 	}
 );
 

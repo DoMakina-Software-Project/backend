@@ -1,12 +1,8 @@
 import { UserRoleModel } from "../models/index.js";
-import { RoleService } from "./index.js";
 
 const UserRoleService = {
 	createUserRole: async ({ userId, role }) => {
 		try {
-			const existingRole = await RoleService.getRole(role);
-			if (!existingRole) throw new Error("Role does not exist");
-
 			const existingUserRole =
 				await UserRoleService.getUserRoleByUserIdAndRole({
 					userId,

@@ -35,7 +35,7 @@ export default {
 		}
 	},
 
-	createUser: async ({ email, name, surname, password, salt, isActive }) => {
+	createUser: async ({ email, name, surname, password, salt, status }) => {
 		try {
 			const user = await UserModel.create({
 				email,
@@ -43,7 +43,7 @@ export default {
 				surname,
 				password,
 				salt,
-				isActive,
+				status,
 			});
 
 			return user.toJSON();

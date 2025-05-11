@@ -32,7 +32,7 @@ const AuthService = {
 				};
 			}
 
-			if (user.isActive) {
+			if (user.status === "ACTIVE") {
 				return {
 					status: "GENERAL_ERROR",
 					message: "User already verified",
@@ -178,10 +178,17 @@ const AuthService = {
 				};
 			}
 
-			if (user.isActive) {
+			if (user.status === "ACTIVE") {
 				return {
 					status: "OK",
 					message: "User already verified",
+				};
+			}
+
+			if (user.status !== "INACTIVE") {
+				return {
+					status: "INVALID_TOKEN",
+					message: "User cannot be verified",
 				};
 			}
 
@@ -198,7 +205,7 @@ const AuthService = {
 			}
 
 			const updatedUser = await UserService.updateUserById(id, {
-				isActive: true,
+				status: "ACTIVE",
 			});
 
 			if (!updatedUser) {

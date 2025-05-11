@@ -2,8 +2,8 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import Car from "./car.model.js";
 
-const Promotion = sequelize.define(
-	"Promotion",
+const RentalAvailability = sequelize.define(
+	"RentalAvailability",
 	{
 		id: {
 			type: DataTypes.INTEGER,
@@ -28,10 +28,6 @@ const Promotion = sequelize.define(
 			type: DataTypes.DATEONLY,
 			allowNull: false,
 		},
-		promotionPrice: {
-			type: DataTypes.DECIMAL(10, 2),
-			allowNull: false,
-		},
 		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
@@ -44,10 +40,10 @@ const Promotion = sequelize.define(
 		},
 	},
 	{
-		tableName: "promotion",
+		tableName: "rental_availability",
 		underscored: true,
 		timestamps: true,
 	}
 );
 
-export default Promotion;
+export default RentalAvailability;

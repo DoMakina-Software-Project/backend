@@ -16,7 +16,7 @@ const Token = sequelize.define(
 			allowNull: false,
 		},
 		type: {
-			type: DataTypes.ENUM("password", "email"),
+			type: DataTypes.ENUM("PASSWORD", "EMAIL"),
 			allowNull: false,
 		},
 		createdAt: {
@@ -42,7 +42,7 @@ const Token = sequelize.define(
 	{
 		tableName: "tokens",
 		underscored: true,
-		timestamps: false,
+		timestamps: true,
 	}
 );
 

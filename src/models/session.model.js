@@ -1,17 +1,19 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const PromotionPrice = sequelize.define(
-	"PromotionPrice",
+const Session = sequelize.define(
+	"Session",
 	{
-		id: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
+		sid: {
+			type: DataTypes.STRING(36),
 			primaryKey: true,
-			autoIncrement: true,
 		},
-		price: {
-			type: DataTypes.DECIMAL(10, 2),
+		expires: {
+			type: DataTypes.DATE,
+			allowNull: false,
+		},
+		data: {
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
 		createdAt: {
@@ -26,10 +28,10 @@ const PromotionPrice = sequelize.define(
 		},
 	},
 	{
-		tableName: "promotion_price",
+		tableName: "Sessions",
 		underscored: true,
 		timestamps: true,
 	}
 );
 
-export default PromotionPrice;
+export default Session;

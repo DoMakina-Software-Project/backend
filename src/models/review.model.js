@@ -1,15 +1,25 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
+import User from "./user.model.js";
 import Car from "./car.model.js";
 
-const Promotion = sequelize.define(
-	"Promotion",
+const Review = sequelize.define(
+	"Review",
 	{
 		id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			primaryKey: true,
 			autoIncrement: true,
+		},
+		userId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			references: {
+				model: User,
+				key: "id",
+			},
+			onDelete: "CASCADE",
 		},
 		carId: {
 			type: DataTypes.INTEGER,
@@ -20,16 +30,16 @@ const Promotion = sequelize.define(
 			},
 			onDelete: "CASCADE",
 		},
-		startDate: {
-			type: DataTypes.DATEONLY,
+		rating: {
+			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				min: 1,
+				max: 5,
+			},
 		},
-		endDate: {
-			type: DataTypes.DATEONLY,
-			allowNull: false,
-		},
-		promotionPrice: {
-			type: DataTypes.DECIMAL(10, 2),
+		comment: {
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
 		createdAt: {
@@ -44,10 +54,10 @@ const Promotion = sequelize.define(
 		},
 	},
 	{
-		tableName: "promotion",
+		tableName: "review",
 		underscored: true,
 		timestamps: true,
 	}
 );
 
-export default Promotion;
+export default Review;
