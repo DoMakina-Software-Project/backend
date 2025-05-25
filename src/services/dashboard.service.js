@@ -6,16 +6,20 @@ import { BrandService } from "./index.js";
 export default {
 	getDashboard: async () => {
 		try {
-			const numberOfUser = await UserRoleService.getCountOfUsersByRole(
-				"user"
+			const numberOfClients = await UserRoleService.getCountOfUsersByRole(
+				"CLIENT"
 			);
 
-			const numberOfAdmins = await UserRoleService.getCountOfUsersByRole(
-				"admin"
+			const numberOfSellers = await UserRoleService.getCountOfUsersByRole(
+				"SELLER"
+			);
+
+			const numberOfStaff = await UserRoleService.getCountOfUsersByRole(
+				"STAFF"
 			);
 
 			const numberOfSuperAdmins =
-				await UserRoleService.getCountOfUsersByRole("superadmin");
+				await UserRoleService.getCountOfUsersByRole("SUPERADMIN");
 
 			const numberOfCars = await CarService.getCountOfCars();
 
@@ -29,8 +33,10 @@ export default {
 			const numberOfBrands = await BrandService.getBrandCount();
 			const topFiveBrands = await BrandService.getTopFiveBrands();
 			return {
-				numberOfUser,
-				numberOfAdmins: numberOfAdmins + numberOfSuperAdmins,
+				numberOfClients,
+				numberOfSellers,
+				numberOfStaff,
+				numberOfSuperAdmins,
 
 				numberOfCars,
 				numberOfSoldCars,

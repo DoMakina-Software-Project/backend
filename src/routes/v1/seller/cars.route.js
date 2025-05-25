@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CarController } from "../../../controllers/private/index.js";
+import { CarController } from "../../../controllers/seller/index.js";
 import { CarValidator, throwValidationErrors } from "../validators/index.js";
 import { uploadCarImagesMiddleware } from "../../../middlewares/index.js";
 

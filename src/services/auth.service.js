@@ -1,8 +1,73 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { UserService, TokenService } from "./index.js";
+import { UserService, TokenService, UserRoleService } from "./index.js";
 import { JWT_SECRET } from "../config/vars.js";
+import { FRONTEND_URL } from "../config/vars.js";
+import { sendEmail } from "../utils/index.js";
+
 const AuthService = {
+	register: async (name, surname, email, password) => {
+		try {
+			const existingUser = await UserService.getUserByEmail(email);
+			if (existingUser)
+				return {
+					status: "GENERAL_ERROR",
+					message: "User already exists",
+				};
+
+			const { salt, hash } = AuthService.saltAndHashPassword(password);
+
+			const newUser = await UserService.createUser({
+				name,
+				surname,
+				email,
+				password: hash,
+				salt,
+				status: "INACTIVE",
+			});
+
+			if (!newUser) {
+				return {
+					status: "GENERAL_ERROR",
+					message: "Failed to create user",
+				};
+			}
+
+			if (newUser.status === "INACTIVE") {
+				const emailToken =
+					await AuthService.generateEmailVerificationToken(
+						newUser.id
+					);
+
+				if (emailToken.status === "OK") {
+					const emailVerificationLink = `${FRONTEND_URL}/verify-email/${emailToken.token}`;
+
+					sendEmail({
+						to: email,
+						subject: "Email verification",
+						html: `Click <a href="${emailVerificationLink}">here</a> to verify your email address.`,
+					});
+				}
+			}
+
+			await UserRoleService.createUserRoles({
+				userId: newUser.id,
+				roles: ["CLIENT", "SELLER"],
+			});
+
+			return {
+				status: "OK",
+				message: "User created successfully",
+			};
+		} catch (error) {
+			console.error("Error registering user:", error);
+			return {
+				status: "GENERAL_ERROR",
+				message: "An error occurred while registering the user",
+			};
+		}
+	},
+
 	comparePasswords: (password, hash, salt) => {
 		const hashVerify = crypto
 			.pbkdf2Sync(password, salt, 10000, 64, "sha512")

@@ -14,19 +14,32 @@ export default {
 
 	async createCar(req, res) {
 		try {
-			const { model, year, price, description, brandId } = req.body;
+			const {
+				model,
+				year,
+				price,
+				description,
+				brandId,
+				mileage,
+				fuelType,
+				transmission,
+				listingType,
+			} = req.body;
 			const userId = req.user.id;
 			const imagesUrls = req.uploadedImages;
 
 			const car = await CarService.createCar({
-				description,
+				sellerId: userId,
+				brandId,
 				model,
 				year,
 				price,
-				userId,
-				brandId,
+				description,
+				mileage,
+				fuelType,
+				transmission,
+				listingType,
 				imagesUrls,
-				isSold: false,
 			});
 			if (!car) {
 				return res.status(400).json({ message: "Car not created." });
@@ -41,9 +54,9 @@ export default {
 	async updateCar(req, res) {
 		try {
 			const { id } = req.params;
-			const { price, isSold } = req.body;
+			const { price } = req.body;
 
-			const car = await CarService.updateCar(id, { price, isSold });
+			const car = await CarService.updateCar(id, { price });
 			if (!car) {
 				return res
 					.status(404)
@@ -92,9 +105,9 @@ export default {
 	async updateIsSold(req, res) {
 		try {
 			const { id } = req.params;
-			const { isSold } = req.body;
+			const { status } = req.body;
 
-			const car = await CarService.updateCar(id, { isSold });
+			const car = await CarService.updateCar(id, { status });
 			if (!car) {
 				return res
 					.status(404)

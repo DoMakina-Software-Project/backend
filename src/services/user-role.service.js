@@ -18,6 +18,30 @@ const UserRoleService = {
 		}
 	},
 
+	createUserRoles: async ({ userId, roles = [] }) => {
+		try {
+			const userRoles = await UserRoleModel.bulkCreate(
+				roles.map((role) => ({ userId, role }))
+			);
+			return userRoles;
+		} catch (error) {
+			console.log(`UserRoleService.createUserRoles() error: ${error}`);
+			throw error;
+		}
+	},
+
+	getUserRoles: async (userId) => {
+		try {
+			const userRoles = await UserRoleModel.findAll({
+				where: { userId },
+			});
+			return userRoles.map((userRole) => userRole.toJSON());
+		} catch (error) {
+			console.log(`UserRoleService.getUserRoles() error: ${error}`);
+			throw error;
+		}
+	},
+
 	getUserRoleByUserIdAndRole: async ({ userId, role }) => {
 		try {
 			const userRole = await UserRoleModel.findOne({

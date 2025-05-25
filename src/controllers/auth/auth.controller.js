@@ -1,15 +1,11 @@
-import {
-	UserService,
-	AuthService,
-	UserRoleService,
-} from "../../services/index.js";
+import { AuthService } from "../../services/index.js";
 import passport from "../../config/passport.js";
 import { sendEmail } from "../../utils/index.js";
 import { FRONTEND_URL } from "../../config/vars.js";
 
 export default {
 	login: (req, res, next) => {
-		passport.authenticate("local", (err, user) => {
+		passport.authenticate("local", async (err, user) => {
 			if (err) {
 				return res.status(400).json({ message: err.message });
 			}
@@ -32,50 +28,15 @@ export default {
 		try {
 			const { name, surname, email, password } = req.body;
 
-			const existingUser = await UserService.getUserByEmail(email);
-			if (existingUser)
-				return res.status(400).json({ message: "User already exists" });
-
-			const { hash, salt } = AuthService.saltAndHashPassword(password);
-
-			const user = await UserService.createUser({
+			const response = await AuthService.register(
 				name,
 				surname,
 				email,
-				password: hash,
-				salt,
-				status: "INACTIVE",
-			});
+				password
+			);
 
-			if (!user)
-				return res
-					.status(400)
-					.json({ message: "User could not be created" });
-
-			const userRole = await UserRoleService.createUserRole({
-				userId: user.id,
-				role: "user",
-			});
-
-			if (!userRole) {
-				return res
-					.status(400)
-					.json({ message: "User role could not be created" });
-			}
-
-			if (user.status === "INACTIVE") {
-				const emailToken =
-					await AuthService.generateEmailVerificationToken(user.id);
-
-				if (emailToken.status === "OK") {
-					const emailVerificationLink = `${FRONTEND_URL}/verify-email/${emailToken.token}`;
-
-					sendEmail({
-						to: email,
-						subject: "Email verification",
-						html: `Click <a href="${emailVerificationLink}">here</a> to verify your email address.`,
-					});
-				}
+			if (response.status !== "OK") {
+				return res.status(400).json({ message: response.message });
 			}
 
 			passport.authenticate("local", (err, user) => {

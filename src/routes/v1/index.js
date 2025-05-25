@@ -1,14 +1,16 @@
 import { Router } from "express";
-import adminRoute from "./admin/index.js";
+import staffRoute from "./staff/index.js";
 import publicRoute from "./public/index.js";
-import privateRoute from "./private/index.js";
+import sellerRoute from "./seller/index.js";
+import clientRoute from "./client/index.js";
 import authRoute from "./auth/index.js";
-import { isAuth, isAdmin } from "../../middlewares/index.js";
+import { isAuth, isStaff } from "../../middlewares/index.js";
 
 const router = Router();
 
-router.use("/admin", isAdmin, adminRoute);
-router.use("/private", isAuth, privateRoute);
+router.use("/staff", isStaff, staffRoute);
+router.use("/seller", isAuth, sellerRoute);
+router.use("/client", isAuth, clientRoute);
 router.use("/auth", authRoute);
 router.use("/public", publicRoute);
 

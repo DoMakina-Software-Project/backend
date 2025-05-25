@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { BrandController } from "../../../controllers/admin/index.js";
+import { BrandController } from "../../../controllers/staff/index.js";
 import { BrandValidator, throwValidationErrors } from "../validators/index.js";
 import { uploadBrandIconMiddleware } from "../../../middlewares/index.js";
 

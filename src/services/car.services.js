@@ -35,24 +35,30 @@ const CarService = {
 	},
 
 	async createCar({
-		description,
+		sellerId,
+		brandId,
 		model,
 		year,
 		price,
-		isSold,
-		userId,
-		brandId,
+		description,
+		mileage,
+		fuelType,
+		transmission,
+		listingType,
 		imagesUrls,
 	}) {
 		try {
 			const newCarModel = await CarModel.create({
-				description,
+				sellerId,
+				brandId,
 				model,
 				year,
 				price,
-				isSold,
-				userId,
-				brandId,
+				description,
+				mileage,
+				fuelType,
+				transmission,
+				listingType,
 			});
 			const images = await CarImageService.createImages(
 				newCarModel.id,
@@ -65,13 +71,20 @@ const CarService = {
 		}
 	},
 
-	async searchCars({ minPrice, maxPrice, brandIds = [], page = 1 }) {
+	async searchCars({
+		minPrice,
+		maxPrice,
+		brandIds = [],
+		page = 1,
+		listingType = "SALE",
+	}) {
 		try {
 			const limit = 10;
 			const offset = (page - 1) * limit;
 
 			const where = {
-				isSold: false,
+				status: "ACTIVE",
+				listingType,
 			};
 			if (minPrice && maxPrice) {
 				where.price = {
@@ -119,13 +132,13 @@ const CarService = {
 			throw error;
 		}
 	},
-	async updateCar(id, { price, isSold }) {
+	async updateCar(id, { price, status }) {
 		try {
 			const car = await CarModel.findByPk(id);
 			if (!car) throw new Error(`Car with ID ${id} not found.`);
 
 			if (price !== undefined) car.price = price;
-			if (isSold !== undefined) car.isSold = isSold;
+			if (status !== undefined) car.status = status;
 			car.updatedAt = new Date();
 
 			await car.save();
@@ -160,7 +173,7 @@ const CarService = {
 					id: {
 						[Op.in]: carIds,
 					},
-					isSold: false,
+					status: "ACTIVE",
 				},
 				include: [
 					{ model: CarImageModel },
@@ -190,6 +203,8 @@ const CarService = {
 
 			const promotions = await PromotionService.getRandomPromotions(6);
 			const carIds = promotions.map((promotion) => promotion.carId);
+
+			if (carIds.length === 0) return [];
 
 			const cars = await CarModel.findAll({
 				where: {
@@ -314,7 +329,7 @@ const CarService = {
 		try {
 			const count = await CarModel.count({
 				where: {
-					isSold: true,
+					status: "SOLD",
 				},
 			});
 			return count;

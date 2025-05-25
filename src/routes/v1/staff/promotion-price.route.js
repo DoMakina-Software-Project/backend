@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { PromotionPriceController } from "../../../controllers/admin/index.js";
+import { PromotionPriceController } from "../../../controllers/staff/index.js";
 import {
 	PromotionPriceValidator,
 	throwValidationErrors,

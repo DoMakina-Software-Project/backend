@@ -24,7 +24,6 @@ export const MAIL = {
 	port: parseInt(process.env.MAIL_PORT || "587", 10),
 	user: process.env.MAIL_USER || "your_mail_user",
 	pass: process.env.MAIL_PASSWORD || "your_mail_password",
-	from: process.env.MAIL_FROM || "your_mail_from",
 };
 
 export const MINIO = {

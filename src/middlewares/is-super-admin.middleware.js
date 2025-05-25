@@ -8,7 +8,7 @@ const isSuperAdmin = (req, res, next) => {
 
 	if (!user) return res.status(401).json({ message: "Unauthenticated" });
 
-	if (!user.roles.includes("superadmin"))
+	if (!user.roles.includes("SUPERADMIN"))
 		return res.status(403).json({ message: "Unauthorized" });
 
 	return next();

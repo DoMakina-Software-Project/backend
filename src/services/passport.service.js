@@ -42,7 +42,7 @@ export default {
 
 			done(null, { ...fetchedUser });
 		} catch (error) {
-			done(error);
+			done(error.message, null);
 		}
 	},
 };

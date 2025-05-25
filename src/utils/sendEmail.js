@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async ({ to, subject, html, throwError = false }) => {
 	try {
 		const response = await transporter.sendMail({
-			from: MAIL.from,
+			from: MAIL.user,
 			to,
 			subject,
 			html,
@@ -26,3 +26,13 @@ const sendEmail = async ({ to, subject, html, throwError = false }) => {
 };
 
 export default sendEmail;
+
+// const test = async () => {
+// 	const response = await sendEmail({
+// 		to: "elisbushaj2@gmail.com",
+// 		subject: "Test Email",
+// 		html: "<p>This is a test email</p>",
+// 	});
+// };
+
+// test();

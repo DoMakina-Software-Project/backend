@@ -4,16 +4,31 @@ export default {
 	updateCar: [
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
 		body("price").isFloat().withMessage("Price must be a number"),
-		body("isSold").isBoolean().withMessage("isSold must be a boolean"),
+		body("status")
+			.isIn(["ACTIVE", "SOLD"])
+			.withMessage("status must be a valid status"),
 	],
 	createCar: [
+		body("brandId").isNumeric().withMessage("brandId must be a number"),
+		body("model").isString().withMessage("model must be a string"),
+		body("year").isInt().withMessage("year must be a number"),
+		body("price").isFloat().withMessage("price must be a number"),
 		body("description")
 			.isString()
 			.withMessage("description must be a string"),
-		body("brandId").isNumeric().withMessage("brandId must be a number"),
-		body("model").isString().withMessage("model must be a string"),
-		body("price").isFloat().withMessage("price must be a number"),
-		body("year").isInt().withMessage("year must be a number"),
+		body("mileage")
+			.optional()
+			.isInt()
+			.withMessage("mileage must be a number"),
+		body("fuelType")
+			.isIn(["PETROL", "DIESEL", "ELECTRIC", "HYBRID", "OTHER"])
+			.withMessage("fuelType must be a valid fuel type"),
+		body("transmission")
+			.isIn(["MANUAL", "AUTOMATIC", "SEMI_AUTOMATIC"])
+			.withMessage("transmission must be a valid transmission type"),
+		body("listingType")
+			.isIn(["SALE", "RENT"])
+			.withMessage("listingType must be a valid listing type"),
 	],
 	deleteCar: [
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
@@ -84,7 +99,9 @@ export default {
 
 	updateIsSold: [
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
-		body("isSold").isBoolean().withMessage("isSold must be a boolean"),
+		body("status")
+			.isIn(["ACTIVE", "SOLD", "HIDDEN"])
+			.withMessage("status must be a valid status"),
 	],
 	deletePromotion: [
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
