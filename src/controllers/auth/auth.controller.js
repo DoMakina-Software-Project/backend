@@ -1,4 +1,4 @@
-import { AuthService } from "../../services/index.js";
+import { AuthService, SellerProfileService } from "../../services/index.js";
 import passport from "../../config/passport.js";
 import { sendEmail } from "../../utils/index.js";
 import { FRONTEND_URL } from "../../config/vars.js";
@@ -76,6 +76,16 @@ export default {
 	getUser: async (req, res) => {
 		const user = req.user;
 		if (!user) return res.status(401).json({ message: "User not found" });
+
+		if (user.roles.includes("SELLER")) {
+			const sellerProfile =
+				await SellerProfileService.getSellerProfileByUserId(user.id);
+
+			return res.status(200).json({
+				...user,
+				sellerProfile,
+			});
+		}
 
 		return res.status(200).json(user);
 	},
