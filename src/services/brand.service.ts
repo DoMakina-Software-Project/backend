@@ -8,7 +8,7 @@ type BrandWithCars = Brand & {
 	Cars?: InferAttributes<CarModel>[];
 };
 
-type TopBrand = Pick<Brand, "id" | "name"> & {
+type TopBrand = Pick<Brand, "id" | "name" | "iconUrl"> & {
 	carCount: number;
 };
 
@@ -116,11 +116,12 @@ export default {
 
 	getTopFiveBrands: async (): Promise<TopBrand[]> => {
 		try {
-			const [results] = await sequelize.query<TopBrand[]>(
+			const results = await sequelize.query<TopBrand>(
 				`
                 SELECT 
                     brand.id, 
                     brand.name, 
+					brand.icon_url as iconUrl,
                     COUNT(car.id) AS carCount
                 FROM brand
                 LEFT JOIN car ON brand.id = car.brand_id
@@ -131,9 +132,10 @@ export default {
 				{ type: QueryTypes.SELECT }
 			);
 
-			return (results || []).map((brand: TopBrand) => ({
+			return results.map((brand: TopBrand) => ({
 				id: brand.id,
 				name: brand.name,
+				iconUrl: brand.iconUrl,
 				carCount: brand.carCount,
 			}));
 		} catch (error) {

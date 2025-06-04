@@ -7,6 +7,7 @@ export { default as CarValidator } from "./car.validator";
 export { default as PromotionValidator } from "./promotion.validator";
 export { default as BrandValidator } from "./brand.validator";
 export { default as SellerProfileValidator } from "./seller-profile.validator";
+export { default as StaffValidator } from "./staff.validator";
 
 export const throwValidationErrors = (
 	req: Request,

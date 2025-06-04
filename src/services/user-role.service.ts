@@ -91,6 +91,28 @@ const UserRoleService = {
 			throw error;
 		}
 	},
+
+	deleteUserRole: async ({
+		userId,
+		role,
+	}: CreateUserRoleParams): Promise<boolean> => {
+		try {
+			const userRole = await UserRoleModel.findOne({
+				where: { userId, role },
+			});
+
+			if (!userRole) throw new Error("User role not found");
+
+			const deleted = await UserRoleModel.destroy({
+				where: { userId, role },
+			});
+
+			return deleted ? true : false;
+		} catch (error) {
+			console.log(`UserRoleService.deleteUserRole() error: ${error}`);
+			throw error;
+		}
+	},
 };
 
 export default UserRoleService;
