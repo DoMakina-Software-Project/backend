@@ -1,5 +1,6 @@
+import { AuthService, UserRoleService } from ".";
 import { UserRoleModel, UserModel } from "../models";
-import { InferAttributes, InferCreationAttributes } from "sequelize";
+import { InferAttributes } from "sequelize";
 
 export type User = InferAttributes<UserModel>;
 
@@ -13,7 +14,19 @@ export type UserWithRoles = UserIncludingRoles & {
 
 type UserCreation = Omit<User, "id" | "createdAt" | "updatedAt">;
 
-export default {
+type UserCreationWithPassword = UserCreation & {
+	password: string;
+};
+
+type StaffCreationParams = Pick<User, "email" | "name" | "surname">;
+
+type StaffCreationResponse = {
+	status: "OK" | "GENERAL_ERROR";
+	message: string;
+	user?: UserCreationWithPassword;
+};
+
+const UserService = {
 	getUserById: async (id: number): Promise<UserWithRoles | null> => {
 		try {
 			const user = await UserModel.findByPk(id, {
@@ -80,4 +93,99 @@ export default {
 			throw error;
 		}
 	},
+
+	getAllStaff: async (): Promise<UserWithRoles[]> => {
+		try {
+			const users = await UserModel.findAll({
+				include: [
+					{
+						model: UserRoleModel,
+						where: {
+							role: "STAFF",
+						},
+					},
+				],
+			});
+
+			return users.map((user) => {
+				const userJson = user.toJSON() as UserIncludingRoles;
+				const { UserRoles, ...rest } = userJson;
+				const roles = UserRoles ? UserRoles.map((ur) => ur.role) : [];
+				return { ...rest, roles };
+			});
+		} catch (error) {
+			console.log(`UserService.getAllStaff() error: ${error}`);
+			throw error;
+		}
+	},
+
+	createStaff: async ({
+		email,
+		name,
+		surname,
+	}: StaffCreationParams): Promise<StaffCreationResponse> => {
+		try {
+			const existingUser = await UserService.getUserByEmail(email);
+			if (existingUser) {
+				const existingUserRole =
+					await UserRoleService.getUserRoleByUserIdAndRole({
+						userId: existingUser.id,
+						role: "STAFF",
+					});
+
+				if (existingUserRole) {
+					return {
+						status: "GENERAL_ERROR",
+						message: "User already exists",
+					};
+				}
+
+				await UserRoleService.createUserRole({
+					userId: existingUser.id,
+					role: "STAFF",
+				});
+
+				return {
+					status: "OK",
+					message: "User role created successfully",
+				};
+			}
+
+			const randomPassword = AuthService.generateRandomPassword();
+			const { salt, hash } =
+				AuthService.saltAndHashPassword(randomPassword);
+
+			const user = await UserService.createUser({
+				email,
+				name,
+				surname,
+				password: hash,
+				salt,
+				status: "ACTIVE",
+			});
+
+			if (!user) {
+				return {
+					status: "GENERAL_ERROR",
+					message: "Failed to create user",
+				};
+			}
+
+			await UserRoleService.createUserRole({
+				userId: user.id,
+				role: "STAFF",
+			});
+
+			return {
+				status: "OK",
+				message: "User created successfully",
+				user: { ...user, password: randomPassword },
+			};
+		} catch (error) {
+			console.log(`UserService.createStaff() error: ${error}`);
+			throw error;
+		}
+	},
 };
+
+export default UserService;
