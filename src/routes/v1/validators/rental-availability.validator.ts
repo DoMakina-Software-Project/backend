@@ -20,6 +20,10 @@ export default {
 			.isISO8601()
 			.toDate()
 			.withMessage("Start date is required"),
+		body("periods.*.endDate")
+			.isISO8601()
+			.toDate()
+			.withMessage("End date is required"),
 	],
 
 	getAvailableDatesInRange: [
