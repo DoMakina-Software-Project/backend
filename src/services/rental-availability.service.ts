@@ -1,4 +1,4 @@
-import RentalAvailability from "../models/rental-availability.model";
+import { RentalAvailabilityModel } from "../models";
 import { Op, Transaction } from "sequelize";
 import sequelize from "../config/db";
 import { addDays, subDays, compareAsc, max, startOfDay } from "date-fns";
@@ -30,7 +30,7 @@ class RentalAvailabilityService {
 			this.validateDateRanges(periods);
 
 			// Get existing availability periods for the car
-			const existingPeriods = await RentalAvailability.findAll({
+			const existingPeriods = await RentalAvailabilityModel.findAll({
 				where: { carId },
 				order: [["startDate", "ASC"]],
 				transaction: t,
@@ -56,13 +56,13 @@ class RentalAvailabilityService {
 			const mergedRanges = this.mergeOverlappingRanges(allRanges);
 
 			// Delete all existing records and insert merged ones
-			await RentalAvailability.destroy({
+			await RentalAvailabilityModel.destroy({
 				where: { carId },
 				transaction: t,
 			});
 
 			if (mergedRanges.length > 0) {
-				await RentalAvailability.bulkCreate(
+				await RentalAvailabilityModel.bulkCreate(
 					mergedRanges.map((range) => ({
 						carId,
 						startDate: range.startDate,
@@ -99,7 +99,7 @@ class RentalAvailabilityService {
 			this.validateDateRanges(periods);
 
 			// Get existing availability periods
-			const existingPeriods = await RentalAvailability.findAll({
+			const existingPeriods = await RentalAvailabilityModel.findAll({
 				where: { carId },
 				order: [["startDate", "ASC"]],
 				transaction: t,
@@ -119,13 +119,13 @@ class RentalAvailabilityService {
 			}
 
 			// Update database
-			await RentalAvailability.destroy({
+			await RentalAvailabilityModel.destroy({
 				where: { carId },
 				transaction: t,
 			});
 
 			if (remainingRanges.length > 0) {
-				await RentalAvailability.bulkCreate(
+				await RentalAvailabilityModel.bulkCreate(
 					remainingRanges.map((range) => ({
 						carId,
 						startDate: range.startDate,
@@ -156,7 +156,7 @@ class RentalAvailabilityService {
 	): Promise<boolean> {
 		this.validateDateRange({ startDate, endDate });
 
-		const availabilityPeriods = await RentalAvailability.findAll({
+		const availabilityPeriods = await RentalAvailabilityModel.findAll({
 			where: {
 				carId,
 				startDate: { [Op.lte]: startDate },
@@ -171,7 +171,7 @@ class RentalAvailabilityService {
 	 * Get all availability periods for a car
 	 */
 	async getAvailability(carId: number): Promise<DateRange[]> {
-		const periods = await RentalAvailability.findAll({
+		const periods = await RentalAvailabilityModel.findAll({
 			where: { carId },
 			order: [["startDate", "ASC"]],
 		});
@@ -192,7 +192,7 @@ class RentalAvailabilityService {
 	): Promise<DateRange[]> {
 		this.validateDateRange({ startDate, endDate });
 
-		const periods = await RentalAvailability.findAll({
+		const periods = await RentalAvailabilityModel.findAll({
 			where: {
 				carId,
 				[Op.or]: [
@@ -244,13 +244,13 @@ class RentalAvailabilityService {
 			);
 
 			// Replace all existing availability
-			await RentalAvailability.destroy({
+			await RentalAvailabilityModel.destroy({
 				where: { carId },
 				transaction: t,
 			});
 
 			if (mergedRanges.length > 0) {
-				await RentalAvailability.bulkCreate(
+				await RentalAvailabilityModel.bulkCreate(
 					mergedRanges.map((range) => ({
 						carId,
 						startDate: range.startDate,
