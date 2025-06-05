@@ -9,6 +9,7 @@ export { default as BrandValidator } from "./brand.validator";
 export { default as SellerProfileValidator } from "./seller-profile.validator";
 export { default as StaffValidator } from "./staff.validator";
 export { default as RentalAvailabilityValidator } from "./rental-availability.validator";
+export { default as BookingValidator } from "./booking.validator";
 
 export const throwValidationErrors = (
 	req: Request,
