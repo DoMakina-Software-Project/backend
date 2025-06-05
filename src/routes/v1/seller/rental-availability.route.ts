@@ -13,12 +13,14 @@ router.post(
 	throwValidationErrors,
 	SellerRentalAvailabilityController.addAvailability
 );
+
 router.post(
 	"/remove",
 	RentalAvailabilityValidator.removeAvailability,
 	throwValidationErrors,
 	SellerRentalAvailabilityController.removeAvailability
 );
+
 router.post(
 	"/available-dates",
 	RentalAvailabilityValidator.getAvailableDatesInRange,
