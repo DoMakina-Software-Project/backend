@@ -47,10 +47,6 @@ const BookingValidator: BookingValidator = {
 		body("paymentStatus")
 			.isIn(["PENDING", "PAID", "REFUNDED", "FAILED"])
 			.withMessage("Invalid payment status"),
-		body("paymentMethod")
-			.optional()
-			.isIn(["PAYPAL", "CASH"])
-			.withMessage("Payment method must be PAYPAL or CASH"),
 	],
 
 	getBookingById: [param("id").isInt().withMessage("Booking ID is required")],

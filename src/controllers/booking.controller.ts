@@ -158,12 +158,11 @@ class BookingController {
 	async updatePaymentStatus(req: Request, res: Response) {
 		try {
 			const bookingId = parseInt(req.params.id);
-			const { paymentStatus, paymentMethod } = req.body;
+			const { paymentStatus } = req.body;
 
 			const updatedBooking = await BookingService.updatePaymentStatus({
 				bookingId,
 				paymentStatus,
-				paymentMethod,
 			});
 
 			res.status(200).json(updatedBooking);

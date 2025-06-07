@@ -309,6 +309,25 @@ const BookingService = {
 	): Promise<BookingWithClientAndCarSeller> {
 		const { bookingId, paymentStatus, paymentMethod } = data;
 
+		const booking = await BookingService.getBookingById(bookingId);
+
+		// Only allow updating payment status for CASH payments
+		if (booking.paymentMethod !== "CASH") {
+			throw new Error(
+				"Payment status can only be updated for cash payments"
+			);
+		}
+
+		// Only allow updating to PAID status
+		if (paymentStatus !== "PAID") {
+			throw new Error("Can only mark cash payments as PAID");
+		}
+
+		// Only allow updating if current status is PENDING
+		if (booking.paymentStatus !== "PENDING") {
+			throw new Error("Can only mark pending payments as PAID");
+		}
+
 		const updateData: any = { paymentStatus };
 
 		if (paymentMethod) {
@@ -369,6 +388,18 @@ const BookingService = {
 		bookingId: number,
 		userId: number
 	): Promise<BookingWithClientAndCarSeller> {
+		const booking = await BookingService.getBookingById(bookingId);
+
+		// Check if payment is completed for cash payments
+		if (
+			booking.paymentMethod === "CASH" &&
+			booking.paymentStatus !== "PAID"
+		) {
+			throw new Error(
+				"Cannot complete booking: Cash payment not received"
+			);
+		}
+
 		return BookingService.updateBookingStatus({
 			bookingId,
 			status: "COMPLETED",
