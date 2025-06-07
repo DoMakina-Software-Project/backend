@@ -1,12 +1,18 @@
 import { Op } from "sequelize";
-import { CarModel, UserModel, BrandModel, BookingModel } from "../models";
+import {
+	CarModel,
+	UserModel,
+	BrandModel,
+	BookingModel,
+	CarImageModel,
+} from "../models";
 import { RentalAvailabilityService } from ".";
 import type { InferAttributes } from "sequelize";
 
 type Booking = InferAttributes<BookingModel>;
 type User = InferAttributes<UserModel>;
 type UserWithoutSensitiveData = Pick<User, "id" | "name" | "email">;
-
+type CarImage = InferAttributes<CarImageModel>;
 type Car = InferAttributes<CarModel>;
 type Brand = InferAttributes<BrandModel>;
 
@@ -22,6 +28,7 @@ type BookingWithCarAndClient = Booking & {
 type BookingWithCarAndSeller = Booking & {
 	Car: CarWithBrand & {
 		User: UserWithoutSensitiveData;
+		CarImages: CarImage[];
 	};
 };
 
@@ -63,9 +70,7 @@ const BookingService = {
 		const { carId, clientId, startDate, endDate, paymentMethod } = data;
 
 		// Check if car exists and is available for rent
-		const car = await CarModel.findByPk(carId, {
-			include: [{ model: UserModel, as: "seller" }],
-		});
+		const car = await CarModel.findByPk(carId);
 
 		if (!car) {
 			throw new Error("Car not found");
@@ -154,6 +159,9 @@ const BookingService = {
 							model: UserModel,
 							attributes: ["id", "name", "email"],
 						},
+						{
+							model: CarImageModel,
+						},
 					],
 				},
 				{
@@ -176,7 +184,14 @@ const BookingService = {
 	async getClientBookings(
 		clientId: number,
 		status?: string
-	): Promise<BookingWithCarAndSeller[]> {
+	): Promise<
+		(Booking & {
+			Car: CarWithBrand & {
+				User: UserWithoutSensitiveData;
+				images: string[];
+			};
+		})[]
+	> {
 		const whereClause: any = { clientId };
 
 		if (status) {
@@ -194,13 +209,34 @@ const BookingService = {
 							model: UserModel,
 							attributes: ["id", "name", "email"],
 						},
+						{
+							model: CarImageModel,
+						},
 					],
 				},
 			],
 			order: [["createdAt", "DESC"]],
 		});
 
-		return bookings.map((booking) => booking.toJSON());
+		const bookingsWithImages = bookings.map((booking) => {
+			const bookingData: BookingWithCarAndSeller = booking.toJSON();
+			const images: string[] = [];
+			bookingData.Car.CarImages.forEach((image) => {
+				images.push(image.url);
+			});
+
+			const { CarImages, ...car } = bookingData.Car;
+
+			return {
+				...bookingData,
+				Car: {
+					...car,
+					images,
+				},
+			};
+		});
+
+		return bookingsWithImages;
 	},
 
 	/**
