@@ -1,4 +1,11 @@
-import { CarModel, CarImageModel, BrandModel, PromotionModel } from "../models";
+import {
+	CarModel,
+	CarImageModel,
+	BrandModel,
+	PromotionModel,
+	RentalAvailabilityModel,
+	BookingModel,
+} from "../models";
 import { Op, InferAttributes } from "sequelize";
 import { CarImageService, PromotionService } from ".";
 
@@ -24,6 +31,8 @@ type SearchCarsParams = {
 	brandIds?: number[];
 	page?: number;
 	listingType?: "SALE" | "RENT";
+	startDate?: string;
+	endDate?: string;
 };
 
 type CreateCarParams = {
@@ -110,6 +119,8 @@ const CarService = {
 		brandIds = [],
 		page = 1,
 		listingType = "SALE",
+		startDate,
+		endDate,
 	}: SearchCarsParams) {
 		try {
 			const limit = 10;
@@ -138,6 +149,73 @@ const CarService = {
 				where.brandId = {
 					[Op.in]: brandIds,
 				};
+			}
+
+			// For rental cars with date range, we need to filter by availability
+			if (listingType === "RENT" && startDate && endDate) {
+				// Get cars that have availability for the requested date range
+				const availableCars = await RentalAvailabilityModel.findAll({
+					where: {
+						startDate: { [Op.lte]: startDate },
+						endDate: { [Op.gte]: endDate },
+					},
+					attributes: ["carId"],
+				});
+
+				const availableCarIds = availableCars.map(
+					(availability) => availability.carId
+				);
+
+				if (availableCarIds.length === 0) {
+					return {
+						results: [],
+						totalItems: 0,
+						hasNextPage: false,
+						totalPages: 0,
+					};
+				}
+
+				// Get cars that don't have conflicting bookings
+				const conflictingBookings = await BookingModel.findAll({
+					where: {
+						carId: { [Op.in]: availableCarIds },
+						status: { [Op.in]: ["PENDING", "CONFIRMED"] },
+						[Op.or]: [
+							{
+								startDate: {
+									[Op.between]: [startDate, endDate],
+								},
+							},
+							{
+								endDate: { [Op.between]: [startDate, endDate] },
+							},
+							{
+								startDate: { [Op.lte]: startDate },
+								endDate: { [Op.gte]: endDate },
+							},
+						],
+					},
+					attributes: ["carId"],
+				});
+
+				const conflictingCarIds = conflictingBookings.map(
+					(booking) => booking.carId
+				);
+
+				const finalAvailableCarIds = availableCarIds.filter(
+					(carId) => !conflictingCarIds.includes(carId)
+				);
+
+				if (finalAvailableCarIds.length === 0) {
+					return {
+						results: [],
+						totalItems: 0,
+						hasNextPage: false,
+						totalPages: 0,
+					};
+				}
+
+				where.id = { [Op.in]: finalAvailableCarIds };
 			}
 
 			const cars = await CarModel.findAndCountAll({

@@ -2,15 +2,11 @@ import { RentalAvailabilityModel } from "../models";
 import { Op, Transaction } from "sequelize";
 import sequelize from "../config/db";
 import { addDays, subDays, compareAsc, max, startOfDay } from "date-fns";
+import { BookingService } from ".";
 
 interface DateRange {
 	startDate: Date;
 	endDate: Date;
-}
-
-interface AvailabilityPeriod extends DateRange {
-	id?: number;
-	carId: number;
 }
 
 class RentalAvailabilityService {
@@ -37,14 +33,10 @@ class RentalAvailabilityService {
 			});
 
 			// Convert to plain objects for easier manipulation
-			const existingRanges: AvailabilityPeriod[] = existingPeriods.map(
-				(p) => ({
-					id: p.id,
-					carId: p.carId,
-					startDate: new Date(p.startDate),
-					endDate: new Date(p.endDate),
-				})
-			);
+			const existingRanges: DateRange[] = existingPeriods.map((p) => ({
+				startDate: new Date(p.startDate),
+				endDate: new Date(p.endDate),
+			}));
 
 			// Add new periods to existing ones
 			const allRanges = [
@@ -274,7 +266,7 @@ class RentalAvailabilityService {
 	/**
 	 * Merge overlapping and adjacent date ranges
 	 */
-	private mergeOverlappingRanges(ranges: AvailabilityPeriod[]): DateRange[] {
+	private mergeOverlappingRanges(ranges: DateRange[]): DateRange[] {
 		if (ranges.length === 0) return [];
 
 		// Sort by start date using date-fns compareAsc

@@ -25,6 +25,9 @@ const CarController = {
 				maxPrice = "1000000",
 				brandIds = [],
 				page,
+				listingType = "SALE",
+				startDate,
+				endDate,
 			} = req.query;
 
 			const parsedBrandIds = Array.isArray(brandIds)
@@ -35,7 +38,10 @@ const CarController = {
 				minPrice: Number(minPrice),
 				maxPrice: Number(maxPrice),
 				brandIds: parsedBrandIds,
-				page: page ? Number(page) : undefined,
+				page: page ? Number(page) : 1,
+				listingType: listingType as "SALE" | "RENT",
+				startDate: startDate as string,
+				endDate: endDate as string,
 			});
 			res.status(200).json(cars);
 		} catch (error: any) {
