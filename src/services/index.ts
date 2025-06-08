@@ -12,6 +12,7 @@ import SellerProfileService from "./seller-profile.service";
 import TokenService from "./token.service";
 import RentalAvailabilityService from "./rental-availability.service";
 import BookingService from "./booking.service";
+import WishlistService from "./wishlist.service";
 
 export {
 	UserService,
@@ -28,4 +29,5 @@ export {
 	TokenService,
 	RentalAvailabilityService,
 	BookingService,
+	WishlistService,
 };
