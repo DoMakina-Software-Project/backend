@@ -318,8 +318,7 @@ const CarService = {
 				(promotion: Promotion) => promotion.carId
 			);
 
-			if (carIds.length === 0) return [];
-
+			
 			const cars = await CarModel.findAll({
 				where: {
 					id: {
