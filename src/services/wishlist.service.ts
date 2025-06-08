@@ -19,9 +19,17 @@ type WishlistWithCar = Wishlist & {
 type WishlistCreation = Omit<Wishlist, "id" | "createdAt" | "updatedAt">;
 
 const WishlistService = {
-	getUserWishlist: async (userId: number): Promise<any[]> => {
+		getUserWishlist: async (userId: number, page: number = 1): Promise<{
+		results: any[];
+		totalItems: number;
+		hasNextPage: boolean;
+		totalPages: number;
+	}> => {
 		try {
-			const wishlistItems = await WishlistModel.findAll({
+			const limit = 10;
+			const offset = (page - 1) * limit;
+
+			const { count, rows: wishlistItems } = await WishlistModel.findAndCountAll({
 				where: { userId },
 				include: [
 					{
@@ -33,21 +41,30 @@ const WishlistService = {
 					},
 				],
 				order: [["createdAt", "DESC"]],
+				limit,
+				offset,
 			});
 
-					return wishlistItems.map((item) => {
-			const itemData = item.toJSON() as WishlistWithCar;
-			const { CarImages, Brand, ...carRest } = itemData.Car;
-			
+			const results = wishlistItems.map((item) => {
+				const itemData = item.toJSON() as WishlistWithCar;
+				const { CarImages, Brand, ...carRest } = itemData.Car;
+				
+				return {
+					...itemData,
+					Car: {
+						...carRest,
+						images: CarImages?.map((image: CarImage) => image.url) || [],
+						brand: Brand?.name || ""
+					}
+				};
+			});
+
 			return {
-				...itemData,
-				Car: {
-					...carRest,
-					images: CarImages?.map((image: CarImage) => image.url) || [],
-					brand: Brand?.name || ""
-				}
+				results,
+				totalItems: count,
+				hasNextPage: limit * page < count,
+				totalPages: Math.ceil(count / limit),
 			};
-		});
 		} catch (error) {
 			console.log(`WishlistService.getUserWishlist() error: ${error}`);
 			throw error;

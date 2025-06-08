@@ -6,7 +6,13 @@ import { isClient } from "../../../middlewares";
 const router = Router();
 
 // Get user's wishlist
-router.get("/", isClient, WishlistController.getUserWishlist);
+router.get(
+	"/", 
+	isClient, 
+	WishlistValidator.getUserWishlist,
+	throwValidationErrors,
+	WishlistController.getUserWishlist
+);
 
 // Add car to wishlist
 router.post(

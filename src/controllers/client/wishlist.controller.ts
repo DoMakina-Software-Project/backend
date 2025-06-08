@@ -15,8 +15,11 @@ const WishlistController = {
 				return;
 			}
 
-			const wishlistItems = await WishlistService.getUserWishlist(userId);
-			res.status(200).json(wishlistItems);
+			const { page } = req.query;
+			const pageNumber = page ? Number(page) : 1;
+
+			const wishlistData = await WishlistService.getUserWishlist(userId, pageNumber);
+			res.status(200).json(wishlistData);
 		} catch (error: any) {
 			console.error(`WishlistController.getUserWishlist error: ${error}`);
 			res.status(500).json({ message: error.message });
