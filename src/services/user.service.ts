@@ -94,9 +94,17 @@ const UserService = {
 		}
 	},
 
-	getAllStaff: async (): Promise<UserWithRoles[]> => {
+	getAllStaff: async (page: number = 1): Promise<{
+		results: UserWithRoles[];
+		totalItems: number;
+		hasNextPage: boolean;
+		totalPages: number;
+	}> => {
 		try {
-			const users = await UserModel.findAll({
+			const limit = 10;
+			const offset = (page - 1) * limit;
+
+			const { count, rows: users } = await UserModel.findAndCountAll({
 				include: [
 					{
 						model: UserRoleModel,
@@ -105,14 +113,24 @@ const UserService = {
 						},
 					},
 				],
+				limit,
+				offset,
+				order: [["createdAt", "DESC"]],
 			});
 
-			return users.map((user) => {
+			const results = users.map((user) => {
 				const userJson = user.toJSON() as UserIncludingRoles;
 				const { UserRoles, ...rest } = userJson;
 				const roles = UserRoles ? UserRoles.map((ur) => ur.role) : [];
 				return { ...rest, roles };
 			});
+
+			return {
+				results,
+				totalItems: count,
+				hasNextPage: limit * page < count,
+				totalPages: Math.ceil(count / limit),
+			};
 		} catch (error) {
 			console.log(`UserService.getAllStaff() error: ${error}`);
 			throw error;

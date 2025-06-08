@@ -29,7 +29,9 @@ export default {
 
 	getAllStaff: async (req: Request, res: Response) => {
 		try {
-			const staff = await UserService.getAllStaff();
+			const { page } = req.query;
+			const pageNumber = page ? Number(page) : 1;
+			const staff = await UserService.getAllStaff(pageNumber);
 			return res.json(staff);
 		} catch (error) {
 			console.error("StaffController.getAllStaff error:", error);

@@ -94,12 +94,40 @@ export default {
 		}
 	},
 
-	getAllBrands: async (): Promise<Brand[]> => {
+	getAllBrands: async (page: number = 1): Promise<{
+		results: Brand[];
+		totalItems: number;
+		hasNextPage: boolean;
+		totalPages: number;
+	}> => {
+		try {
+			const limit = 10;
+			const offset = (page - 1) * limit;
+
+			const { count, rows: brands } = await BrandModel.findAndCountAll({
+				limit,
+				offset,
+				order: [["createdAt", "DESC"]],
+			});
+
+			return {
+				results: brands.map((brand) => brand.toJSON()),
+				totalItems: count,
+				hasNextPage: limit * page < count,
+				totalPages: Math.ceil(count / limit),
+			};
+		} catch (error) {
+			console.log(`BrandService.getAllBrands() error: ${error}`);
+			throw error;
+		}
+	},
+
+	getAllBrandsSimple: async (): Promise<Brand[]> => {
 		try {
 			const brands = await BrandModel.findAll();
 			return brands.map((brand) => brand.toJSON());
 		} catch (error) {
-			console.log(`BrandService.getAllBrands() error: ${error}`);
+			console.log(`BrandService.getAllBrandsSimple() error: ${error}`);
 			throw error;
 		}
 	},
