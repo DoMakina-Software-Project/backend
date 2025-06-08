@@ -311,21 +311,31 @@ const BookingService = {
 
 		const booking = await BookingService.getBookingById(bookingId);
 
-		// Only allow updating payment status for CASH payments
-		if (booking.paymentMethod !== "CASH") {
-			throw new Error(
-				"Payment status can only be updated for cash payments"
-			);
-		}
+		// Allow refunding for canceled bookings with paid status
+		if (paymentStatus === "REFUNDED") {
+			if (booking.status !== "CANCELLED") {
+				throw new Error("Can only refund canceled bookings");
+			}
+			if (booking.paymentStatus !== "PAID") {
+				throw new Error("Can only refund paid bookings");
+			}
+		} else {
+			// Only allow updating payment status for CASH payments
+			if (booking.paymentMethod !== "CASH") {
+				throw new Error(
+					"Payment status can only be updated for cash payments"
+				);
+			}
 
-		// Only allow updating to PAID status
-		if (paymentStatus !== "PAID") {
-			throw new Error("Can only mark cash payments as PAID");
-		}
+			// Only allow updating to PAID status
+			if (paymentStatus !== "PAID") {
+				throw new Error("Can only mark cash payments as PAID");
+			}
 
-		// Only allow updating if current status is PENDING
-		if (booking.paymentStatus !== "PENDING") {
-			throw new Error("Can only mark pending payments as PAID");
+			// Only allow updating if current status is PENDING
+			if (booking.paymentStatus !== "PENDING") {
+				throw new Error("Can only mark pending payments as PAID");
+			}
 		}
 
 		const updateData: any = { paymentStatus };
@@ -337,6 +347,35 @@ const BookingService = {
 		await BookingModel.update(updateData, { where: { id: bookingId } });
 
 		return BookingService.getBookingById(bookingId);
+	},
+
+	/**
+	 * Refund booking
+	 */
+	async refundBooking(
+		bookingId: number,
+		userId: number
+	): Promise<BookingWithClientAndCarSeller> {
+		const booking = await BookingService.getBookingById(bookingId);
+
+		// Check permissions - only seller can refund
+		if (booking.Car.sellerId !== userId) {
+			throw new Error("Only the car owner can process refunds");
+		}
+
+		// Check if booking can be refunded
+		if (booking.status !== "CANCELLED") {
+			throw new Error("Can only refund canceled bookings");
+		}
+
+		if (booking.paymentStatus !== "PAID") {
+			throw new Error("Can only refund paid bookings");
+		}
+
+		return BookingService.updatePaymentStatus({
+			bookingId,
+			paymentStatus: "REFUNDED",
+		});
 	},
 
 	/**
@@ -549,9 +588,9 @@ const BookingService = {
 			],
 		});
 
+		// Calculate revenue from paid bookings (excluding refunded ones)
 		const revenueBookings = await BookingModel.findAll({
 			where: {
-				status: { [Op.in]: ["COMPLETED", "CONFIRMED"] },
 				paymentStatus: "PAID",
 			},
 			include: [
