@@ -1,7 +1,20 @@
-import { WishlistModel, CarModel } from "../models";
+import { WishlistModel, CarModel, CarImageModel, BrandModel } from "../models";
 import { InferAttributes } from "sequelize";
 
 export type Wishlist = InferAttributes<WishlistModel>;
+
+type CarImage = InferAttributes<CarImageModel>;
+type Brand = InferAttributes<BrandModel>;
+type Car = InferAttributes<CarModel>;
+
+type CarWithRelations = Car & {
+	CarImages?: CarImage[];
+	Brand?: Brand;
+};
+
+type WishlistWithCar = Wishlist & {
+	Car: CarWithRelations;
+};
 
 type WishlistCreation = Omit<Wishlist, "id" | "createdAt" | "updatedAt">;
 
@@ -13,12 +26,28 @@ const WishlistService = {
 				include: [
 					{
 						model: CarModel,
+						include: [
+							{ model: CarImageModel },
+							{ model: BrandModel }
+						],
 					},
 				],
 				order: [["createdAt", "DESC"]],
 			});
 
-			return wishlistItems.map((item) => item.toJSON());
+					return wishlistItems.map((item) => {
+			const itemData = item.toJSON() as WishlistWithCar;
+			const { CarImages, Brand, ...carRest } = itemData.Car;
+			
+			return {
+				...itemData,
+				Car: {
+					...carRest,
+					images: CarImages?.map((image: CarImage) => image.url) || [],
+					brand: Brand?.name || ""
+				}
+			};
+		});
 		} catch (error) {
 			console.log(`WishlistService.getUserWishlist() error: ${error}`);
 			throw error;
