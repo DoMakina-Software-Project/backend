@@ -7,6 +7,9 @@ const router = Router();
 
 router.get("/", SellerCarController.getUserCars);
 
+// Get verification statistics for the seller
+router.get("/verification/stats", SellerCarController.getVerificationStats);
+
 router.post(
 	"/",
 	uploadCarImagesMiddleware,

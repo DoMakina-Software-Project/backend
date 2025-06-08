@@ -9,6 +9,10 @@ interface CarValidator {
 	getWishlistCars: ValidationChain[];
 	updateIsSold: ValidationChain[];
 	deletePromotion: ValidationChain[];
+	getUnverifiedCars: ValidationChain[];
+	getCarForVerification: ValidationChain[];
+	approveCar: ValidationChain[];
+	rejectCar: ValidationChain[];
 }
 
 const CarValidator: CarValidator = {
@@ -116,6 +120,39 @@ const CarValidator: CarValidator = {
 	],
 	deletePromotion: [
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
+	],
+
+	// New verification validators
+	getUnverifiedCars: [
+		query("page")
+			.optional()
+			.isInt({ min: 1 })
+			.withMessage("page must be a positive integer")
+			.toInt(),
+		query("limit")
+			.optional()
+			.isInt({ min: 1, max: 50 })
+			.withMessage("limit must be between 1 and 50")
+			.toInt(),
+		query("status")
+			.optional()
+			.isIn(["PENDING", "APPROVED", "REJECTED"])
+			.withMessage("status must be PENDING, APPROVED, or REJECTED"),
+	],
+	getCarForVerification: [
+		param("id").isNumeric().withMessage("ID must be a number").toInt(),
+	],
+	approveCar: [
+		param("id").isNumeric().withMessage("ID must be a number").toInt(),
+	],
+	rejectCar: [
+		param("id").isNumeric().withMessage("ID must be a number").toInt(),
+		body("reason")
+			.optional()
+			.isString()
+			.withMessage("reason must be a string")
+			.isLength({ max: 500 })
+			.withMessage("reason must not exceed 500 characters"),
 	],
 };
 
