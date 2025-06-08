@@ -58,6 +58,24 @@ const CarValidator: CarValidator = {
 			.isFloat()
 			.withMessage("maxPrice must be a number")
 			.toFloat(),
+		query("minYear")
+			.optional({ values: "falsy" })
+			.isInt({ min: 1990, max: new Date().getFullYear() })
+			.withMessage(`Year must be between 1990 and ${new Date().getFullYear()}`),
+		query("maxYear")
+			.optional({ values: "falsy" })
+			.isInt({ min: 1990, max: new Date().getFullYear() })
+			.withMessage(`Year must be between 1990 and ${new Date().getFullYear()}`),
+		query("minMileage")
+			.optional({ values: "falsy" })
+			.isInt({ min: 0 })
+			.withMessage("Minimum mileage must be a positive number")
+			.toInt(),
+		query("maxMileage")
+			.optional({ values: "falsy" })
+			.isInt({ min: 0 })
+			.withMessage("Maximum mileage must be a positive number")
+			.toInt(),
 		query("brandIds")
 			.optional()
 			.isArray()
@@ -69,7 +87,7 @@ const CarValidator: CarValidator = {
 
 				value.map((id) => {
 					if (typeof id === "string" && /^\d+$/.test(id)) {
-						return Number(id); // Convert numeric strings to numbers
+						return Number(id);
 					} else if (typeof id !== "number") {
 						throw new Error("brandIds must be an array of numbers");
 					}
@@ -78,12 +96,41 @@ const CarValidator: CarValidator = {
 
 				return true;
 			}),
-
+		query("modelSearch")
+			.optional()
+			.isString()
+			.withMessage("modelSearch must be a string")
+			.isLength({ min: 1, max: 50 })
+			.withMessage("modelSearch must be between 1 and 50 characters"),
+		query("city")
+			.optional()
+			.isString()
+			.withMessage("city must be a string"),
+		query("fuelType")
+			.optional()
+			.isIn(["PETROL", "DIESEL", "ELECTRIC", "HYBRID", "OTHER"])
+			.withMessage("fuelType must be a valid fuel type"),
+		query("transmission")
+			.optional()
+			.isIn(["MANUAL", "AUTOMATIC", "SEMI_AUTOMATIC"])
+			.withMessage("transmission must be a valid transmission type"),
 		query("page")
 			.optional()
 			.isInt()
 			.withMessage("page must be a number")
 			.toInt(),
+		query("listingType")
+			.optional()
+			.isIn(["SALE", "RENT"])
+			.withMessage("listingType must be either SALE or RENT"),
+		query("startDate")
+			.optional()
+			.isISO8601()
+			.withMessage("startDate must be a valid date"),
+		query("endDate")
+			.optional()
+			.isISO8601()
+			.withMessage("endDate must be a valid date"),
 	],
 	getWishlistCars: [
 		query("ids")

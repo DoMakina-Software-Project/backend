@@ -28,7 +28,15 @@ type CarResponse = Omit<Car, "CarImages" | "Brand"> & {
 type SearchCarsParams = {
 	minPrice?: number;
 	maxPrice?: number;
+	minYear?: string;
+	maxYear?: string;
+	minMileage?: number;
+	maxMileage?: number;
 	brandIds?: number[];
+	modelSearch?: string;
+	city?: string;
+	fuelType?: "PETROL" | "DIESEL" | "ELECTRIC" | "HYBRID" | "OTHER";
+	transmission?: "MANUAL" | "AUTOMATIC" | "SEMI_AUTOMATIC";
 	page?: number;
 	listingType?: "SALE" | "RENT";
 	startDate?: string;
@@ -116,7 +124,15 @@ const CarService = {
 	async searchCars({
 		minPrice,
 		maxPrice,
+		minYear,
+		maxYear,
+		minMileage,
+		maxMileage,
 		brandIds = [],
+		modelSearch,
+		city,
+		fuelType,
+		transmission,
 		page = 1,
 		listingType = "SALE",
 		startDate,
@@ -145,10 +161,56 @@ const CarService = {
 				};
 			}
 
+			if (minYear && maxYear) {
+				where.year = {
+					[Op.between]: [minYear, maxYear],
+				};
+			} else if (minYear) {
+				where.year = {
+					[Op.gte]: minYear,
+				};
+			} else if (maxYear) {
+				where.year = {
+					[Op.lte]: maxYear,
+				};
+			}
+
+			if (minMileage && maxMileage) {
+				where.mileage = {
+					[Op.between]: [minMileage, maxMileage],
+				};
+			} else if (minMileage) {
+				where.mileage = {
+					[Op.gte]: minMileage,
+				};
+			} else if (maxMileage) {
+				where.mileage = {
+					[Op.lte]: maxMileage,
+				};
+			}
+
 			if (brandIds && brandIds.length > 0) {
 				where.brandId = {
 					[Op.in]: brandIds,
 				};
+			}
+
+			if (modelSearch) {
+				where.model = {
+					[Op.iLike]: `%${modelSearch}%`,
+				};
+			}
+
+			if (city) {
+				where.city = city;
+			}
+
+			if (fuelType) {
+				where.fuelType = fuelType;
+			}
+
+			if (transmission) {
+				where.transmission = transmission;
 			}
 
 			// For rental cars with date range, we need to filter by availability
