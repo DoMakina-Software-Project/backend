@@ -150,6 +150,22 @@ const SellerCarController = {
 			res.status(500).json({ message: error.message });
 		}
 	},
+
+	async getVerificationStats(
+		req: SellerRequest,
+		res: Response
+	): Promise<void> {
+		try {
+			const sellerId = req.user.id;
+			const stats = await CarService.getSellerVerificationStats(sellerId);
+			res.status(200).json(stats);
+		} catch (error: any) {
+			console.error(
+				`CarController.getVerificationStats() error: ${error}`
+			);
+			res.status(500).json({ message: error.message });
+		}
+	},
 };
 
 export default SellerCarController;

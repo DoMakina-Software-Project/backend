@@ -5,6 +5,7 @@ import {
 	PromotionModel,
 	RentalAvailabilityModel,
 	BookingModel,
+	UserModel,
 } from "../models";
 import { Op, InferAttributes } from "sequelize";
 import { CarImageService, PromotionService } from ".";
@@ -13,16 +14,26 @@ type Car = InferAttributes<CarModel>;
 type CarImage = InferAttributes<CarImageModel>;
 type Brand = InferAttributes<BrandModel>;
 type Promotion = InferAttributes<PromotionModel>;
+type User = InferAttributes<UserModel>;
 
 type CarWithRelations = Car & {
 	CarImages?: CarImage[];
 	Brand?: Brand;
+	User?: Pick<User, "id" | "name" | "email">;
 };
 
 type CarResponse = Omit<Car, "CarImages" | "Brand"> & {
 	images: string[];
 	brand: string;
 	promoted?: boolean;
+	rejectionReason?: string;
+};
+
+type CarVerificationResponse = Car & {
+	images: string[];
+	brand: string;
+	seller: Pick<User, "id" | "name" | "email">;
+	rejectionReason?: string;
 };
 
 type SearchCarsParams = {
@@ -52,6 +63,19 @@ type CreateCarParams = {
 type UpdateCarParams = {
 	price?: number;
 	status?: "ACTIVE" | "HIDDEN" | "SOLD";
+};
+
+type GetUnverifiedCarsParams = {
+	page: number;
+	limit: number;
+	status: "PENDING" | "APPROVED" | "REJECTED";
+};
+
+type UpdateVerificationStatusParams = {
+	carId: number;
+	status: "APPROVED" | "REJECTED";
+	verifiedBy: number;
+	rejectionReason?: string;
 };
 
 const CarService = {
@@ -128,6 +152,7 @@ const CarService = {
 
 			const where: any = {
 				status: "ACTIVE",
+				verificationStatus: "APPROVED", // Only show approved cars to clients
 				listingType,
 			};
 
@@ -252,6 +277,12 @@ const CarService = {
 
 			if (price !== undefined) car.price = price;
 			if (status !== undefined) car.status = status;
+
+			// Reset verification status to PENDING when car details are updated
+			if (price !== undefined) {
+				car.verificationStatus = "PENDING";
+			}
+
 			car.updatedAt = new Date();
 
 			await car.save();
@@ -291,6 +322,7 @@ const CarService = {
 						[Op.in]: carIds,
 					},
 					status: "ACTIVE",
+					verificationStatus: "APPROVED", // Only show approved cars
 				},
 				include: [{ model: CarImageModel }, { model: BrandModel }],
 			});
@@ -324,6 +356,7 @@ const CarService = {
 						[Op.in]: carIds,
 					},
 					status: "ACTIVE",
+					verificationStatus: "APPROVED", // Only show approved cars
 				},
 				include: [{ model: CarImageModel }, { model: BrandModel }],
 			});
@@ -336,6 +369,7 @@ const CarService = {
 						[Op.notIn]: existingIds,
 					},
 					status: "ACTIVE",
+					verificationStatus: "APPROVED", // Only show approved cars
 				},
 				limit: MAX_CARS - existingIds.length,
 				include: [{ model: CarImageModel }, { model: BrandModel }],
@@ -379,6 +413,7 @@ const CarService = {
 					id: {
 						[Op.in]: ids,
 					},
+					verificationStatus: "APPROVED", // Only show approved cars
 				},
 				include: [{ model: CarImageModel }, { model: BrandModel }],
 			});
@@ -431,7 +466,11 @@ const CarService = {
 
 	async getCountOfCars(): Promise<number> {
 		try {
-			return await CarModel.count();
+			return await CarModel.count({
+				where: {
+					verificationStatus: "APPROVED", // Only count approved cars
+				},
+			});
 		} catch (error) {
 			console.error(`carModelService.getCountOfCars() error: ${error}`);
 			throw error;
@@ -443,11 +482,205 @@ const CarService = {
 			return await CarModel.count({
 				where: {
 					status: "SOLD",
+					verificationStatus: "APPROVED", // Only count approved cars
 				},
 			});
 		} catch (error) {
 			console.error(
 				`carModelService.getCountOfSoldCars() error: ${error}`
+			);
+			throw error;
+		}
+	},
+
+	// New verification methods
+	async getUnverifiedCars({
+		page,
+		limit,
+		status,
+	}: GetUnverifiedCarsParams): Promise<{
+		results: CarVerificationResponse[];
+		totalItems: number;
+		hasNextPage: boolean;
+		totalPages: number;
+	}> {
+		try {
+			const offset = (page - 1) * limit;
+
+			const cars = await CarModel.findAndCountAll({
+				where: {
+					verificationStatus: status,
+				},
+				limit,
+				offset,
+				include: [
+					{ model: CarImageModel },
+					{ model: BrandModel },
+					{
+						model: UserModel,
+						attributes: ["id", "name", "email"],
+					},
+				],
+				order: [["createdAt", "DESC"]],
+			});
+
+			const results = cars.rows.map((car) => {
+				const { CarImages, Brand, User, ...rest } =
+					car.toJSON() as CarWithRelations;
+				return {
+					...rest,
+					images: CarImages?.map((image) => image.url) || [],
+					brand: Brand?.name || "",
+					seller: User || { id: 0, name: "", email: "" },
+				};
+			});
+
+			return {
+				results,
+				totalItems: cars.count,
+				hasNextPage: limit * page < cars.count,
+				totalPages: Math.ceil(cars.count / limit),
+			};
+		} catch (error) {
+			console.error(
+				`carModelService.getUnverifiedCars() error: ${error}`
+			);
+			throw error;
+		}
+	},
+
+	async getCarForVerification(
+		carId: number
+	): Promise<CarVerificationResponse | null> {
+		try {
+			const car = await CarModel.findByPk(carId, {
+				include: [
+					{ model: CarImageModel },
+					{ model: BrandModel },
+					{
+						model: UserModel,
+						attributes: ["id", "name", "email"],
+					},
+				],
+			});
+
+			if (!car) return null;
+
+			const { CarImages, Brand, User, ...rest } =
+				car.toJSON() as CarWithRelations;
+
+			return {
+				...rest,
+				images: CarImages?.map((image) => image.url) || [],
+				brand: Brand?.name || "",
+				seller: User || { id: 0, name: "", email: "" },
+			};
+		} catch (error) {
+			console.error(
+				`carModelService.getCarForVerification() error: ${error}`
+			);
+			throw error;
+		}
+	},
+
+	async updateVerificationStatus({
+		carId,
+		status,
+		verifiedBy,
+		rejectionReason,
+	}: UpdateVerificationStatusParams): Promise<Car> {
+		try {
+			const car = await CarModel.findByPk(carId);
+			if (!car) throw new Error(`Car with ID ${carId} not found.`);
+
+			car.verificationStatus = status;
+			car.updatedAt = new Date();
+
+			// Store rejection reason if the car is being rejected
+			if (status === "REJECTED" && rejectionReason) {
+				car.rejectionReason = rejectionReason;
+			} else if (status === "APPROVED") {
+				// Clear rejection reason if car is approved
+				car.rejectionReason = null;
+			}
+
+			await car.save();
+
+			return car.toJSON();
+		} catch (error) {
+			console.error(
+				`carModelService.updateVerificationStatus() error: ${error}`
+			);
+			throw error;
+		}
+	},
+
+	async getVerificationStats(): Promise<{
+		pending: number;
+		approved: number;
+		rejected: number;
+		total: number;
+	}> {
+		try {
+			const [pending, approved, rejected, total] = await Promise.all([
+				CarModel.count({ where: { verificationStatus: "PENDING" } }),
+				CarModel.count({ where: { verificationStatus: "APPROVED" } }),
+				CarModel.count({ where: { verificationStatus: "REJECTED" } }),
+				CarModel.count(),
+			]);
+
+			return {
+				pending,
+				approved,
+				rejected,
+				total,
+			};
+		} catch (error) {
+			console.error(
+				`carModelService.getVerificationStats() error: ${error}`
+			);
+			throw error;
+		}
+	},
+
+	async getSellerVerificationStats(sellerId: number): Promise<{
+		pending: number;
+		approved: number;
+		rejected: number;
+		total: number;
+	}> {
+		try {
+			const [pending, approved, rejected, total] = await Promise.all([
+				CarModel.count({
+					where: {
+						sellerId,
+						verificationStatus: "PENDING",
+					},
+				}),
+				CarModel.count({
+					where: {
+						sellerId,
+						verificationStatus: "APPROVED",
+					},
+				}),
+				CarModel.count({
+					where: {
+						sellerId,
+						verificationStatus: "REJECTED",
+					},
+				}),
+				CarModel.count({ where: { sellerId } }),
+			]);
+
+			return {
+				pending,
+				approved,
+				rejected,
+				total,
+			};
+		} catch (error) {
+			console.error(
+				`carModelService.getSellerVerificationStats() error: ${error}`
 			);
 			throw error;
 		}

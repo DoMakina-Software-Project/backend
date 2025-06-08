@@ -24,6 +24,7 @@ class Car extends Model<InferAttributes<Car>, InferCreationAttributes<Car>> {
 	declare listingType: "SALE" | "RENT";
 	declare status: "SOLD" | "HIDDEN" | "ACTIVE";
 	declare verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
+	declare rejectionReason: CreationOptional<string>;
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
 }
@@ -101,6 +102,10 @@ Car.init(
 			type: DataTypes.ENUM("PENDING", "APPROVED", "REJECTED"),
 			allowNull: false,
 			defaultValue: "PENDING",
+		},
+		rejectionReason: {
+			type: DataTypes.STRING,
+			allowNull: true,
 		},
 		createdAt: {
 			type: DataTypes.DATE,
