@@ -1,0 +1,1 @@
+export { default as WishlistController } from "./wishlist.controller"; 

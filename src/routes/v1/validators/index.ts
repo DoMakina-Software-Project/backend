@@ -10,6 +10,7 @@ export { default as SellerProfileValidator } from "./seller-profile.validator";
 export { default as StaffValidator } from "./staff.validator";
 export { default as RentalAvailabilityValidator } from "./rental-availability.validator";
 export { default as BookingValidator } from "./booking.validator";
+export { default as WishlistValidator } from "./wishlist.validator";
 
 export const throwValidationErrors = (
 	req: Request,
