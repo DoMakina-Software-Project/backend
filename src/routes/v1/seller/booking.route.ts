@@ -79,4 +79,12 @@ router.patch(
 	BookingController.updatePaymentStatus
 );
 
+// Refund booking
+router.patch(
+	"/:id/refund",
+	BookingValidator.getBookingById,
+	throwValidationErrors,
+	BookingController.refundBooking
+);
+
 export default router;

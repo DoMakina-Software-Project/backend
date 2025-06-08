@@ -309,6 +309,39 @@ class BookingController {
 	}
 
 	/**
+	 * Refund booking
+	 */
+	async refundBooking(req: Request, res: Response) {
+		try {
+			const bookingId = parseInt(req.params.id);
+			const sellerId = (req as any).user?.id;
+
+			if (!sellerId) {
+				return res.status(401).json({
+					message: "Unauthorized: User not found",
+				});
+			}
+
+			const refundedBooking = await BookingService.refundBooking(
+				bookingId,
+				sellerId
+			);
+
+			res.status(200).json(refundedBooking);
+		} catch (error: any) {
+			if (error.message.includes("permission")) {
+				return res.status(403).json({ message: error.message });
+			}
+			if (error.message.includes("not found")) {
+				return res.status(404).json({ message: error.message });
+			}
+			res.status(400).json({
+				message: error.message || "Failed to refund booking",
+			});
+		}
+	}
+
+	/**
 	 * Check booking availability
 	 */
 	async checkAvailability(req: Request, res: Response) {
