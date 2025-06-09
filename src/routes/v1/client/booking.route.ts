@@ -20,14 +20,6 @@ router.get(
 	BookingController.getClientBookings
 );
 
-// Check availability
-router.post(
-	"/check-availability",
-	BookingValidator.checkAvailability,
-	throwValidationErrors,
-	BookingController.checkAvailability
-);
-
 // Get upcoming bookings
 router.get(
 	"/upcoming",

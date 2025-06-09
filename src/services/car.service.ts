@@ -6,8 +6,9 @@ import {
 	RentalAvailabilityModel,
 	BookingModel,
 	UserModel,
+	SellerProfileModel,
 } from "../models";
-import { Op, InferAttributes } from "sequelize";
+import { Op, InferAttributes, Sequelize } from "sequelize";
 import { CarImageService, PromotionService } from ".";
 
 type Car = InferAttributes<CarModel>;
@@ -221,14 +222,17 @@ const CarService = {
 			}
 
 			if (modelSearch) {
-				where.model = {
-					[Op.iLike]: `%${modelSearch}%`,
-				};
+				where[Op.and] = [
+					...(where[Op.and] || []),
+					Sequelize.where(
+						Sequelize.fn("LOWER", Sequelize.col("model")),
+						"LIKE",
+						`%${modelSearch.toLowerCase()}%`
+					),
+				];
 			}
 
-			if (city) {
-				where.city = city;
-			}
+			// City filtering will be handled through include
 
 			if (fuelType) {
 				where.fuelType = fuelType;
@@ -305,11 +309,33 @@ const CarService = {
 				where.id = { [Op.in]: finalAvailableCarIds };
 			}
 
+			// Prepare include array
+			const include: any[] = [
+				{ model: CarImageModel },
+				{ model: BrandModel },
+			];
+
+			// Add seller profile include for city filtering
+			if (city) {
+				include.push({
+					model: UserModel,
+					include: [
+						{
+							model: SellerProfileModel,
+							where: { city },
+							required: true,
+						},
+					],
+					required: true,
+					attributes: [], // We don't need User data in response
+				});
+			}
+
 			const cars = await CarModel.findAndCountAll({
 				where,
 				limit,
 				offset,
-				include: [{ model: CarImageModel }, { model: BrandModel }],
+				include,
 			});
 
 			return {
