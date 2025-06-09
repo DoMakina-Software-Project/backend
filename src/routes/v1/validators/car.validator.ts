@@ -18,10 +18,73 @@ interface CarValidator {
 const CarValidator: CarValidator = {
 	updateCar: [
 		param("id").isNumeric().withMessage("ID must be a number").toInt(),
-		body("price").isFloat().withMessage("Price must be a number"),
+		body("brandId")
+			.optional()
+			.isNumeric()
+			.withMessage("brandId must be a number"),
+		body("model")
+			.optional()
+			.isString()
+			.withMessage("model must be a string")
+			.isLength({ min: 2, max: 50 })
+			.withMessage("model must be between 2 and 50 characters"),
+		body("year")
+			.optional()
+			.isInt({ min: 1990, max: new Date().getFullYear() })
+			.withMessage(
+				`year must be between 1990 and ${new Date().getFullYear()}`
+			),
+		body("price")
+			.optional()
+			.isFloat({ min: 0 })
+			.withMessage("price must be a positive number"),
+		body("description")
+			.optional()
+			.isString()
+			.withMessage("description must be a string")
+			.isLength({ min: 10, max: 500 })
+			.withMessage("description must be between 10 and 500 characters"),
+		body("mileage")
+			.optional()
+			.isInt({ min: 0, max: 1000000 })
+			.withMessage("mileage must be between 0 and 1,000,000"),
+		body("fuelType")
+			.optional()
+			.isIn(["PETROL", "DIESEL", "ELECTRIC", "HYBRID", "OTHER"])
+			.withMessage("fuelType must be a valid fuel type"),
+		body("transmission")
+			.optional()
+			.isIn(["MANUAL", "AUTOMATIC", "SEMI_AUTOMATIC"])
+			.withMessage("transmission must be a valid transmission type"),
+		body("listingType")
+			.optional()
+			.isIn(["SALE", "RENT"])
+			.withMessage("listingType must be a valid listing type"),
 		body("status")
-			.isIn(["ACTIVE", "SOLD"])
+			.optional()
+			.isIn(["ACTIVE", "SOLD", "HIDDEN"])
 			.withMessage("status must be a valid status"),
+		body("removedImageIds")
+			.optional()
+			.custom((value) => {
+				if (value === undefined || value === "") return true;
+				try {
+					const parsed = JSON.parse(value);
+					if (!Array.isArray(parsed)) {
+						throw new Error("removedImageIds must be an array");
+					}
+					if (!parsed.every((id) => Number.isInteger(Number(id)))) {
+						throw new Error(
+							"All removedImageIds must be valid integers"
+						);
+					}
+					return true;
+				} catch (error) {
+					throw new Error(
+						"removedImageIds must be a valid JSON array of integers"
+					);
+				}
+			}),
 	],
 	createCar: [
 		body("brandId").isNumeric().withMessage("brandId must be a number"),
@@ -65,11 +128,15 @@ const CarValidator: CarValidator = {
 		query("minYear")
 			.optional({ values: "falsy" })
 			.isInt({ min: 1990, max: new Date().getFullYear() })
-			.withMessage(`Year must be between 1990 and ${new Date().getFullYear()}`),
+			.withMessage(
+				`Year must be between 1990 and ${new Date().getFullYear()}`
+			),
 		query("maxYear")
 			.optional({ values: "falsy" })
 			.isInt({ min: 1990, max: new Date().getFullYear() })
-			.withMessage(`Year must be between 1990 and ${new Date().getFullYear()}`),
+			.withMessage(
+				`Year must be between 1990 and ${new Date().getFullYear()}`
+			),
 		query("minMileage")
 			.optional({ values: "falsy" })
 			.isInt({ min: 0 })

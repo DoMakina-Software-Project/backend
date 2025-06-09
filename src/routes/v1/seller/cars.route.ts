@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { SellerCarController } from "../../../controllers/seller";
 import { CarValidator, throwValidationErrors } from "../validators";
-import { uploadCarImagesMiddleware } from "../../../middlewares";
+import {
+	uploadCarImagesMiddleware,
+	uploadCarImagesUpdateMiddleware,
+} from "../../../middlewares";
 
 const router = Router();
 
@@ -20,6 +23,7 @@ router.post(
 
 router.put(
 	"/:id",
+	uploadCarImagesUpdateMiddleware,
 	CarValidator.updateCar,
 	throwValidationErrors,
 	SellerCarController.updateCar
