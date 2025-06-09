@@ -25,6 +25,7 @@ type CarWithRelations = Car & {
 
 type CarResponse = Omit<Car, "CarImages" | "Brand"> & {
 	images: string[];
+	imageIds?: number[];
 	brand: string;
 	promoted?: boolean;
 	rejectionReason?: string;
@@ -70,8 +71,18 @@ type CreateCarParams = {
 };
 
 type UpdateCarParams = {
+	brandId?: number;
+	model?: string;
+	year?: string;
 	price?: number;
+	description?: string;
+	mileage?: number;
+	fuelType?: "PETROL" | "DIESEL" | "ELECTRIC" | "HYBRID" | "OTHER";
+	transmission?: "MANUAL" | "AUTOMATIC" | "SEMI_AUTOMATIC";
+	listingType?: "SALE" | "RENT";
 	status?: "ACTIVE" | "HIDDEN" | "SOLD";
+	newImagesUrls?: string[];
+	removedImageIds?: number[];
 };
 
 type GetUnverifiedCarsParams = {
@@ -102,6 +113,7 @@ const CarService = {
 			return {
 				...rest,
 				images: CarImages?.map((image) => image.url) || [],
+				imageIds: CarImages?.map((image) => image.id) || [],
 				brand: Brand?.name || "",
 			};
 		} catch (error) {
@@ -355,25 +367,63 @@ const CarService = {
 		}
 	},
 
-	async updateCar(
-		id: number,
-		{ price, status }: UpdateCarParams
-	): Promise<Car> {
+	async updateCar(id: number, params: UpdateCarParams): Promise<Car> {
 		try {
 			const car = await CarModel.findByPk(id);
 			if (!car) throw new Error(`Car with ID ${id} not found.`);
 
-			if (price !== undefined) car.price = price;
-			if (status !== undefined) car.status = status;
+			// Update basic car fields
+			if (params.brandId !== undefined) car.brandId = params.brandId;
+			if (params.model !== undefined) car.model = params.model;
+			if (params.year !== undefined) car.year = params.year;
+			if (params.price !== undefined) car.price = params.price;
+			if (params.description !== undefined)
+				car.description = params.description;
+			if (params.mileage !== undefined) car.mileage = params.mileage;
+			if (params.fuelType !== undefined) car.fuelType = params.fuelType;
+			if (params.transmission !== undefined)
+				car.transmission = params.transmission;
+			if (params.listingType !== undefined)
+				car.listingType = params.listingType;
+			if (params.status !== undefined) car.status = params.status;
 
-			// Reset verification status to PENDING when car details are updated
-			if (price !== undefined) {
+			// Reset verification status to PENDING when car details are updated (except for status-only updates)
+			const isContentUpdate =
+				params.brandId !== undefined ||
+				params.model !== undefined ||
+				params.year !== undefined ||
+				params.price !== undefined ||
+				params.description !== undefined ||
+				params.mileage !== undefined ||
+				params.fuelType !== undefined ||
+				params.transmission !== undefined ||
+				params.listingType !== undefined ||
+				params.newImagesUrls !== undefined ||
+				params.removedImageIds !== undefined;
+
+			if (isContentUpdate) {
 				car.verificationStatus = "PENDING";
+				car.rejectionReason = null; // Clear any previous rejection reason
 			}
 
 			car.updatedAt = new Date();
-
 			await car.save();
+
+			// Handle image updates
+			// Remove specific images by ID if provided
+			if (params.removedImageIds && params.removedImageIds.length > 0) {
+				await CarImageModel.destroy({
+					where: {
+						id: { [Op.in]: params.removedImageIds },
+						carId: id, // Ensure we only delete images belonging to this car
+					},
+				});
+			}
+
+			// Add new images if provided
+			if (params.newImagesUrls && params.newImagesUrls.length > 0) {
+				await CarImageService.createImages(id, params.newImagesUrls);
+			}
 
 			return car.toJSON();
 		} catch (error) {
@@ -531,7 +581,8 @@ const CarService = {
 				const { CarImages, Brand, ...rest } =
 					car.toJSON() as CarWithRelations;
 				const images = CarImages?.map((image) => image.url) || [];
-				return { ...rest, images, brand: Brand?.name || "" };
+				const imageIds = CarImages?.map((image) => image.id) || [];
+				return { ...rest, images, imageIds, brand: Brand?.name || "" };
 			});
 		} catch (error) {
 			console.error(`carModelService.getUserCars() error: ${error}`);

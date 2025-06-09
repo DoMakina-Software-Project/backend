@@ -59,12 +59,61 @@ const SellerCarController = {
 		}
 	},
 
-	async updateCar(req: Request, res: Response): Promise<void> {
+	async updateCar(req: SellerRequest, res: Response): Promise<void> {
 		try {
 			const { id } = req.params;
-			const { price } = req.body;
+			const {
+				brandId,
+				model,
+				year,
+				price,
+				description,
+				mileage,
+				fuelType,
+				transmission,
+				listingType,
+				status,
+			} = req.body;
 
-			const car = await CarService.updateCar(Number(id), { price });
+			// Prepare update parameters
+			const updateParams: any = {};
+			if (brandId !== undefined) updateParams.brandId = Number(brandId);
+			if (model !== undefined) updateParams.model = model;
+			if (year !== undefined) updateParams.year = year;
+			if (price !== undefined) updateParams.price = Number(price);
+			if (description !== undefined)
+				updateParams.description = description;
+			if (mileage !== undefined) updateParams.mileage = Number(mileage);
+			if (fuelType !== undefined) updateParams.fuelType = fuelType;
+			if (transmission !== undefined)
+				updateParams.transmission = transmission;
+			if (listingType !== undefined)
+				updateParams.listingType = listingType;
+			if (status !== undefined) updateParams.status = status;
+
+			// Handle image updates
+			const { removedImageIds } = req.body;
+
+			// Add new images if uploaded
+			if (req.uploadedImages && req.uploadedImages.length > 0) {
+				updateParams.newImagesUrls = req.uploadedImages;
+			}
+
+			// Handle removed images by ID
+			if (removedImageIds) {
+				try {
+					const parsedIds = JSON.parse(removedImageIds);
+					if (Array.isArray(parsedIds) && parsedIds.length > 0) {
+						updateParams.removedImageIds = parsedIds.map(
+							(id: any) => Number(id)
+						);
+					}
+				} catch (error) {
+					console.error("Error parsing removedImageIds:", error);
+				}
+			}
+
+			const car = await CarService.updateCar(Number(id), updateParams);
 			if (!car) {
 				res.status(404).json({
 					message: `Car with ID ${id} not found.`,
