@@ -82,7 +82,9 @@ const StaffBrandController = {
 
 	async getAllBrands(req: Request, res: Response): Promise<void> {
 		try {
-			const brands = await BrandService.getAllBrands();
+			const { page } = req.query;
+			const pageNumber = page ? Number(page) : 1;
+			const brands = await BrandService.getAllBrands(pageNumber);
 			res.status(200).json(brands);
 		} catch (error: any) {
 			res.status(500).json({ message: error.message });

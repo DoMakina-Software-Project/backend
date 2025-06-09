@@ -5,6 +5,7 @@ import { BrandValidator, throwValidationErrors } from "../validators";
 
 const router = Router();
 
+router.get("/", StaffBrandController.getAllBrands);
 router.get("/:id", StaffBrandController.getBrand);
 router.post(
 	"/",
