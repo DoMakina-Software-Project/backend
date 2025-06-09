@@ -9,6 +9,7 @@ import {
 import sequelize from "../config/db";
 import User from "./user.model";
 import Car from "./car.model";
+import Booking from "./booking.model";
 
 class Review extends Model<
 	InferAttributes<Review>,
@@ -17,6 +18,7 @@ class Review extends Model<
 	declare id: CreationOptional<number>;
 	declare userId: ForeignKey<User["id"]>;
 	declare carId: ForeignKey<Car["id"]>;
+	declare bookingId: ForeignKey<Booking["id"]>;
 	declare rating: number;
 	declare comment: string;
 	declare createdAt: CreationOptional<Date>;
@@ -48,6 +50,16 @@ Review.init(
 				key: "id",
 			},
 			onDelete: "CASCADE",
+		},
+		bookingId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			references: {
+				model: Booking,
+				key: "id",
+			},
+			onDelete: "CASCADE",
+			unique: true,
 		},
 		rating: {
 			type: DataTypes.INTEGER,
