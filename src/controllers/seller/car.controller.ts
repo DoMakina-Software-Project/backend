@@ -139,10 +139,10 @@ const SellerCarController = {
 
 			const result = await CarService.deleteCar(Number(id));
 			if (!result) {
-				res.status(404).json({ message: "Car has not been deleted." });
+				res.status(404).json({ message: "Car has not been hidden." });
 				return;
 			}
-			res.status(200).json(result);
+			res.status(200).json({ message: "Car has been hidden successfully." });
 		} catch (error: any) {
 			console.error(`CarController.deleteCar() error: ${error}`);
 			res.status(500).json({ message: error.message });
@@ -152,7 +152,10 @@ const SellerCarController = {
 	async getUserCars(req: SellerRequest, res: Response): Promise<void> {
 		try {
 			const userId = req.user.id;
-			const cars = await CarService.getUserCars(userId);
+			const page = parseInt(req.query.page as string) || 1;
+			const listingType = req.query.listingType as "SALE" | "RENT" | undefined;
+			
+			const cars = await CarService.getUserCars(userId, page, 9, listingType);
 			res.status(200).json(cars);
 		} catch (error: any) {
 			console.error(`CarController.getUserCars() error: ${error}`);
@@ -165,6 +168,13 @@ const SellerCarController = {
 			const { id } = req.params;
 			const { status } = req.body;
 
+			if (!["ACTIVE", "SOLD"].includes(status)) {
+				res.status(400).json({
+					message: "Invalid status. Must be either ACTIVE or SOLD.",
+				});
+				return;
+			}
+
 			const car = await CarService.updateCar(Number(id), { status });
 			if (!car) {
 				res.status(404).json({
@@ -173,7 +183,7 @@ const SellerCarController = {
 				return;
 			}
 			res.status(200).json({
-				message: `Updated successfully.`,
+				message: `Car status updated successfully.`,
 			});
 		} catch (error: any) {
 			console.error(`CarController.updateIsSold() error: ${error}`);
