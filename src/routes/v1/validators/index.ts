@@ -12,6 +12,7 @@ export { default as RentalAvailabilityValidator } from "./rental-availability.va
 export { default as BookingValidator } from "./booking.validator";
 export { default as WishlistValidator } from "./wishlist.validator";
 export { default as ReviewValidator } from "./review.validator";
+export * as UserValidator from "./user.validator";
 
 export const throwValidationErrors = (
 	req: Request,

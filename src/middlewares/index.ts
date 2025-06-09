@@ -8,3 +8,4 @@ export {
 	uploadCarImagesUpdateMiddleware,
 } from "./upload-car-images.middleware";
 export { default as uploadBrandIconMiddleware } from "./upload-brand-icon.middleware";
+export { default as checkUserStatus } from "./check-user-status.middleware";
