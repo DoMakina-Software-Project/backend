@@ -20,7 +20,12 @@ type User = InferAttributes<UserModel>;
 type CarWithRelations = Car & {
 	CarImages?: CarImage[];
 	Brand?: Brand;
-	User?: Pick<User, "id" | "name" | "email">;
+	User?: Pick<User, "id" | "name" | "email"> & {
+		SellerProfile?: {
+			contactEmail: string;
+			contactPhone: string;
+		};
+	};
 };
 
 type CarResponse = Omit<Car, "CarImages" | "Brand"> & {
@@ -29,6 +34,8 @@ type CarResponse = Omit<Car, "CarImages" | "Brand"> & {
 	brand: string;
 	promoted?: boolean;
 	rejectionReason?: string;
+	sellerEmail?: string;
+	sellerPhone?: string;
 };
 
 type CarVerificationResponse = Car & {
@@ -102,12 +109,20 @@ const CarService = {
 	async getCarById(id: number): Promise<CarResponse | null> {
 		try {
 			const car = await CarModel.findByPk(id, {
-				include: [{ model: CarImageModel }, { model: BrandModel }],
+				include: [
+					{ model: CarImageModel },
+					{ model: BrandModel },
+					{
+						model: UserModel,
+						include: [{ model: SellerProfileModel }],
+						attributes: ["id", "name", "email"],
+					},
+				],
 			});
 
 			if (!car) return null;
 
-			const { CarImages, Brand, ...rest } =
+			const { CarImages, Brand, User, ...rest } =
 				car.toJSON() as CarWithRelations;
 
 			return {
@@ -115,6 +130,8 @@ const CarService = {
 				images: CarImages?.map((image) => image.url) || [],
 				imageIds: CarImages?.map((image) => image.id) || [],
 				brand: Brand?.name || "",
+				sellerEmail: User?.SellerProfile?.contactEmail || "",
+				sellerPhone: User?.SellerProfile?.contactPhone || "",
 			};
 		} catch (error) {
 			console.error(`carModelService.getCarById() error: ${error}`);
