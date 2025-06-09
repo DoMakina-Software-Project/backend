@@ -434,15 +434,17 @@ const CarService = {
 
 	async deleteCar(id: number): Promise<boolean> {
 		try {
-			const result = await CarModel.destroy({
-				where: { id },
-			});
+			const car = await CarModel.findByPk(id);
+			if (!car) return false;
 
-			return result > 0;
+			car.status = "HIDDEN";
+			await car.save();
+
+			return true;
 		} catch (err) {
-			console.error("Error deleting car:", err);
+			console.error("Error hiding car:", err);
 			throw new Error(
-				"Unable to delete the car. Please try again later."
+				"Unable to hide the car. Please try again later."
 			);
 		}
 	},
@@ -568,22 +570,51 @@ const CarService = {
 		}
 	},
 
-	async getUserCars(userId: number): Promise<CarResponse[]> {
+	async getUserCars(
+		userId: number,
+		page: number = 1,
+		limit: number = 9,
+		listingType?: "SALE" | "RENT"
+	): Promise<{
+		results: CarResponse[];
+		totalItems: number;
+		hasNextPage: boolean;
+		totalPages: number;
+	}> {
 		try {
-			const cars = await CarModel.findAll({
-				where: {
-					sellerId: userId,
-				},
+			const offset = (page - 1) * limit;
+
+			const where: any = {
+				sellerId: userId,
+				status: { [Op.ne]: "HIDDEN" },
+			};
+
+			if (listingType) {
+				where.listingType = listingType;
+			}
+
+			const { rows, count } = await CarModel.findAndCountAll({
+				where,
+				limit,
+				offset,
 				include: [{ model: CarImageModel }, { model: BrandModel }],
+				order: [["createdAt", "DESC"]],
 			});
 
-			return cars.map((car) => {
+			const results = rows.map((car) => {
 				const { CarImages, Brand, ...rest } =
 					car.toJSON() as CarWithRelations;
 				const images = CarImages?.map((image) => image.url) || [];
 				const imageIds = CarImages?.map((image) => image.id) || [];
 				return { ...rest, images, imageIds, brand: Brand?.name || "" };
 			});
+
+			return {
+				results,
+				totalItems: count,
+				hasNextPage: offset + limit < count,
+				totalPages: Math.ceil(count / limit),
+			};
 		} catch (error) {
 			console.error(`carModelService.getUserCars() error: ${error}`);
 			throw error;
@@ -649,6 +680,7 @@ const CarService = {
 			const cars = await CarModel.findAndCountAll({
 				where: {
 					verificationStatus: status,
+					status: { [Op.ne]: "HIDDEN" }, // Don't show hidden cars
 				},
 				limit,
 				offset,
