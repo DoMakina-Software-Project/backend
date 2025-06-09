@@ -21,9 +21,17 @@ const CarController = {
 	async searchCars(req: Request, res: Response): Promise<void> {
 		try {
 			const {
-				minPrice = "0",
-				maxPrice = "1000000",
+				minPrice,
+				maxPrice,
+				minYear,
+				maxYear,
+				minMileage,
+				maxMileage,
 				brandIds = [],
+				modelSearch,
+				city,
+				fuelType,
+				transmission,
 				page,
 				listingType = "SALE",
 				startDate,
@@ -35,9 +43,26 @@ const CarController = {
 				: [];
 
 			const cars = await CarService.searchCars({
-				minPrice: Number(minPrice),
-				maxPrice: Number(maxPrice),
-				brandIds: parsedBrandIds,
+				minPrice: minPrice ? Number(minPrice) : undefined,
+				maxPrice: maxPrice ? Number(maxPrice) : undefined,
+				minYear: minYear as string,
+				maxYear: maxYear as string,
+				minMileage: minMileage ? Number(minMileage) : undefined,
+				maxMileage: maxMileage ? Number(maxMileage) : undefined,
+				brandIds:
+					parsedBrandIds.length > 0 ? parsedBrandIds : undefined,
+				modelSearch: modelSearch as string,
+				city: city as string,
+				fuelType: fuelType as
+					| "PETROL"
+					| "DIESEL"
+					| "ELECTRIC"
+					| "HYBRID"
+					| "OTHER",
+				transmission: transmission as
+					| "MANUAL"
+					| "AUTOMATIC"
+					| "SEMI_AUTOMATIC",
 				page: page ? Number(page) : 1,
 				listingType: listingType as "SALE" | "RENT",
 				startDate: startDate as string,
