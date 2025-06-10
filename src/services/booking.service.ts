@@ -41,7 +41,7 @@ type CreateBookingData = {
 	clientId: number;
 	startDate: Date;
 	endDate: Date;
-	paymentMethod?: "PAYPAL" | "CASH";
+	paymentMethod?: "CASH";
 };
 
 interface UpdateBookingStatusData {
@@ -59,7 +59,7 @@ interface UpdateBookingStatusData {
 interface UpdatePaymentStatusData {
 	bookingId: number;
 	paymentStatus: "PENDING" | "PAID" | "REFUNDED" | "FAILED";
-	paymentMethod?: "PAYPAL" | "CASH";
+	paymentMethod?: "CASH";
 }
 
 const BookingService = {

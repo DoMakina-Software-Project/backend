@@ -27,7 +27,7 @@ class Booking extends Model<
 		| "REJECTED"
 		| "EXPIRED";
 	declare paymentStatus: "PENDING" | "PAID" | "REFUNDED" | "FAILED";
-	declare paymentMethod: CreationOptional<"PAYPAL" | "CASH">;
+	declare paymentMethod: CreationOptional<"CASH">;
 	declare totalPrice: number;
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
@@ -85,7 +85,7 @@ Booking.init(
 			defaultValue: "PENDING",
 		},
 		paymentMethod: {
-			type: DataTypes.ENUM("PAYPAL", "CASH"),
+			type: DataTypes.ENUM("CASH"),
 			allowNull: true,
 		},
 		totalPrice: {
