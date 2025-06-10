@@ -24,8 +24,8 @@ const BookingValidator: BookingValidator = {
 			.withMessage("End date is required"),
 		body("paymentMethod")
 			.optional()
-			.isIn(["PAYPAL", "CASH"])
-			.withMessage("Payment method must be PAYPAL or CASH"),
+			.isIn(["CASH"])
+			.withMessage("Payment method must be CASH"),
 	],
 
 	updateBookingStatus: [
