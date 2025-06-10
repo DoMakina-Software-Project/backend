@@ -87,8 +87,18 @@ class RentalAvailabilityService {
 		const t = transaction || (await sequelize.transaction());
 
 		try {
-			// Validate input
-			this.validateDateRanges(periods);
+			// Validate input - only check basic date range validity, allow past dates for removal
+			if (!periods || periods.length === 0) {
+				throw new Error("At least one date range is required");
+			}
+
+			for (const range of periods) {
+				if (compareAsc(range.startDate, range.endDate) > 0) {
+					throw new Error(
+						"Start date must be before or equal to end date"
+					);
+				}
+			}
 
 			// Get existing availability periods
 			const existingPeriods = await RentalAvailabilityModel.findAll({
@@ -182,7 +192,10 @@ class RentalAvailabilityService {
 		startDate: Date,
 		endDate: Date
 	): Promise<DateRange[]> {
-		this.validateDateRange({ startDate, endDate });
+		// Only validate that start date is before end date, allow past dates for querying
+		if (compareAsc(startDate, endDate) > 0) {
+			throw new Error("Start date must be before or equal to end date");
+		}
 
 		const periods = await RentalAvailabilityModel.findAll({
 			where: {
