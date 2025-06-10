@@ -70,6 +70,15 @@ The following npm scripts are available for use:
     ```
     Starts the application with `nodemon`, enabling live reloads whenever code changes.
 
+3. **Apply pending migrations**:
+    ```bash
+    npm run migrate
+    ```
+   
+4. **Compile typescript files & delete "dist"**:
+    ```bash
+    npm run build
+    ```
 ---
 
 ## Project Structure
@@ -85,6 +94,7 @@ Below is the structure of the project for easier navigation:
 │   ├── models/        # Database models
 |   ├── services/      # Business logic
 │   ├── middlewares/   # Middleware logic
+|   ├── cli/           # Command Line Script
 │   ├── utils/         # Utility functions
 │   └── config/        # Configuration files
 ├── .env               # Environment variable file
